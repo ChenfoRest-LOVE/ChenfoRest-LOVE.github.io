@@ -1,0 +1,13 @@
+:root{--paper:#fff;--ink:#181818;--muted:#707070;--line:#dedede;--surface:#fafafa;--line-strong:#181818;--sans:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif;--serif:Charter,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman","Songti SC",SimSun,serif;color-scheme:light}
+html[data-theme="dark"]{--paper:#121212;--ink:#ededed;--muted:#a3a3a3;--line:#303030;--surface:#1a1a1a;--line-strong:#ededed;color-scheme:dark}
+html{background:var(--paper)}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);transition:background-color .25s,color .25s}
+.header{border-color:var(--line-strong)}
+.margin-note,.brand small,.hero-bottom p span,.muted,.section header>p,.section header>small,.education h3 small,.education dt small,.education dd,.empty-row>span,.content-list time,footer{color:var(--muted)}
+.hero-lines{color:var(--line)}.hero-lines .strong{stroke:var(--ink)}.eyebrow i{background:var(--ink)}
+.header-actions{display:flex;align-items:center;gap:22px}.theme-toggle{border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);padding:4px 9px;display:flex;gap:5px;align-items:center;font-size:12px;cursor:pointer}.theme-toggle:hover{border-color:var(--ink)}.theme-toggle span{font-size:15px}.theme-toggle b{font-weight:400}
+#quote,#quote button,.section,.education,.empty-row,.content-list article,.tags li,.empty-row b,.contact>i{border-color:var(--line)}
+#quote button{background:transparent;color:var(--ink)}#quote>div{min-width:0}#quote cite{display:block;color:var(--muted);font:11px monospace;letter-spacing:1px;margin-top:4px;font-style:normal}#quote p{font-family:var(--serif);letter-spacing:.5px}.hero em,.contact h2 em,.section h2{font-family:var(--serif)}
+.photo-grid{background:var(--surface)}.skip:focus{background:var(--paper)}
+@media(max-width:760px){.header-actions{margin-top:11px;justify-content:space-between;gap:8px}.header-actions nav{margin-top:0}.theme-toggle b{display:none}.theme-toggle{padding:3px 8px}}
+@media(prefers-reduced-motion:reduce){body{transition:none}}
