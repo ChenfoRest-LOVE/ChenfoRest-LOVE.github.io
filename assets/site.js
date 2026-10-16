@@ -116,9 +116,9 @@ function showWritingEmpty(container, failed = false) {
   const mark = element('span', '', '—');
   mark.setAttribute('aria-hidden', 'true');
   const copy = element('div');
-  copy.append(element('h3', '', failed ? '文字暂未能加载。' : '一些想法，正在酝酿。'));
-  copy.append(element('p', '', failed ? '请稍后刷新页面，再来看看。' : '文章与随笔，会在这里慢慢更新。'));
-  row.append(mark, copy, element('small', '', failed ? 'PLEASE TRY AGAIN' : 'TO BE CONTINUED'));
+  copy.append(element('h3', '', failed ? '文字加载失败。' : '暂无公开条目。'));
+  copy.append(element('p', '', failed ? '刷新页面重试。' : '随笔与阅读记录。'));
+  row.append(mark, copy, element('small', '', failed ? 'LOAD FAILED' : 'NO ENTRIES'));
   container.replaceChildren(row);
 }
 async function hydrateWriting() {
@@ -152,9 +152,9 @@ async function hydrateWriting() {
 }
 
 const samplePhotos = [
-  { src: 'assets/images/forest-hero.jpg', alt: '雾气笼罩的绿色森林与山谷', caption: '走进森林', category: 'forest', credit: '示例影像 · Marvin Zettl / Unsplash', width: 2400, height: 3223 },
-  { src: 'assets/images/forest-detail.jpg', alt: '薄雾中层层延伸的深绿色森林树木', caption: '绿意之间', category: 'forest', credit: '示例影像 · Fethi Benattallah / Unsplash', width: 1400, height: 2100 },
-  { src: 'assets/images/coast.jpg', alt: '海浪与海岸相遇的自然景色', caption: '向海而行', category: 'coast', credit: '示例影像 · Dylan Crawford / Unsplash', width: 1400, height: 788 }
+  { src: 'assets/images/forest-hero.jpg', alt: '雾中的森林小径', caption: '林径', category: 'forest', credit: '示例影像 · Marvin Zettl / Unsplash', width: 2400, height: 3223 },
+  { src: 'assets/images/forest-detail.jpg', alt: '薄雾中层层延伸的深绿色森林树木', caption: '雾林', category: 'forest', credit: '示例影像 · Fethi Benattallah / Unsplash', width: 1400, height: 2100 },
+  { src: 'assets/images/coast.jpg', alt: '海浪与海岸相遇的自然景色', caption: '礁岸', category: 'coast', credit: '示例影像 · Dylan Crawford / Unsplash', width: 1400, height: 788 }
 ];
 let photos = [];
 let visiblePhotos = [];
