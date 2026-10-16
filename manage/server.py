@@ -8,7 +8,6 @@ import mimetypes
 import os
 from pathlib import Path, PurePosixPath
 import secrets
-import shutil
 import subprocess
 import threading
 from urllib.parse import unquote, urlsplit
@@ -72,10 +71,7 @@ class Publisher:
             step = 'push'
             self.git('push', 'origin', 'main')
             revision = self.git('rev-parse', 'HEAD')
-            step = 'tencent'
-            shell = shutil.which('pwsh') or 'powershell.exe'
-            self.run([shell, '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', str(self.root / 'deploy/publish.ps1'), '-Revision', revision], timeout=180)
-            return {'revision': revision, 'message': '封面已提交并同步腾讯云；GitHub Pages 通常需要稍等片刻更新。'}
+            return {'revision': revision, 'message': '封面已提交 GitHub，腾讯云暂不同步；GitHub Pages 通常需要稍等片刻更新。'}
         except PublishError:
             raise
         except (subprocess.SubprocessError, OSError, RuntimeError) as error:
@@ -96,8 +92,7 @@ class Publisher:
             messages = {'check':'无法检查本机仓库，请确认 Git 可用。',
                         'fetch':'无法同步 GitHub，请检查网络与本机登录状态。',
                         'save':'无法完成本机封面提交；已保留完成的提交或恢复未提交更改，可重试。',
-                        'push':'封面已保存到本机，GitHub 推送失败；检查网络或登录后可重试。',
-                        'tencent':'GitHub 已更新，但腾讯云同步失败；可重试同步。'}
+                        'push':'封面已保存到本机，GitHub 推送失败；检查网络或登录后可重试。'}
             raise PublishError(step, messages[step]) from error
 
 
@@ -158,7 +153,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(403, {'error':'仅允许本机管理地址。'})
         path = unquote(urlsplit(self.path).path)
         if path == '/_manage/health':
-            return self.send(200, {'app':'forest-cover-manager', 'version':1})
+            return self.send(200, {'app':'forest-cover-manager', 'version':2, 'publicationMode':'github-only'})
         if path == '/_manage/state':
             if not self.authenticated():
                 return self.send(403, {'error':'请从本机管理入口重新打开。'})

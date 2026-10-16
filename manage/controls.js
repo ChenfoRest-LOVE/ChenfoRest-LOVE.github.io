@@ -17,11 +17,11 @@
   document.head.append(style);
   const bar = node('aside','manager-bar');
   bar.setAttribute('aria-label','封面管理');
-  bar.append(node('strong','','默认封面 · 仅本机'),node('span','','仅修改仓库默认值；在线管理保存的封面优先。'));
+  bar.append(node('strong','','GitHub 封面管理'),node('span','','修改后发布 GitHub，腾讯云待后续同步。'));
   const online = node('a','','在线封面管理 ↗');
   online.href = 'https://denss.asia/admin/';
   bar.append(online);
-  const sync = node('button','manager-action','同步当前封面');
+  const sync = node('button','manager-action','发布当前封面');
   sync.type = 'button';
   const status = node('p','manager-status');
   status.setAttribute('role','status');
@@ -36,7 +36,7 @@
       button.textContent = current ? '当前封面' : '设为封面';
       button.setAttribute('aria-pressed',String(current));
       button.disabled = busy;
-      button.title = current ? '可重新同步当前封面' : '将此照片设为图册封面并发布';
+      button.title = current ? '可重新发布当前封面到 GitHub' : '将此照片设为图册封面并发布 GitHub';
     });
     sync.disabled = busy;
   }
@@ -55,7 +55,7 @@
       const fresh = await fetch('/_manage/state',{credentials:'same-origin',cache:'no-store'});
       if (fresh.ok) state = await fresh.json();
       status.textContent = data.message || '封面已发布。';
-      sync.textContent = '同步当前封面';
+      sync.textContent = '发布当前封面';
       retry = null;
     } catch (error) {
       status.dataset.error = 'true';

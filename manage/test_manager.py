@@ -78,15 +78,15 @@ class PublisherTests(Fixture):
                 Publisher(self.root, runner=self.runner(dirty, branch)).publish('companions', 'images/friends-table-full.webp')
             self.assertFalse(any('push' in cmd for cmd in self.commands))
 
-    def test_publish_stages_only_cover_files_and_uses_existing_deploy_script(self):
+    def test_publish_stages_only_cover_files_and_does_not_deploy_tencent(self):
         result = Publisher(self.root, runner=self.runner()).publish('companions', 'images/friends-table-full.webp')
         self.assertEqual(result['revision'], 'a' * 40)
         add = next(c for c in self.commands if 'add' in c)
         self.assertEqual(add[3:], ['add', '--', 'content/photos/albums.json', 'photos.html'])
         self.assertTrue(any(c[-3:] == ['push', 'origin', 'main'] for c in self.commands))
-        self.assertTrue(any(str(self.root / 'deploy/publish.ps1') in c for c in self.commands))
-        deployment = next(c for c in self.commands if str(self.root / 'deploy/publish.ps1') in c)
-        self.assertEqual(deployment[-2:], ['-Revision', 'a' * 40])
+        self.assertFalse(any(str(self.root / 'deploy/publish.ps1') in c for c in self.commands))
+        self.assertTrue(all(c[0] == 'git' for c in self.commands))
+        self.assertIn('腾讯云暂不同步', result['message'])
         commit = next(c for c in self.commands if 'commit' in c)
         self.assertIn('--only', commit)
         self.assertEqual(commit[-3:], ['--', 'content/photos/albums.json', 'photos.html'])
