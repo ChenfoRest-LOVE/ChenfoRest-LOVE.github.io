@@ -1,0 +1,26 @@
+[
+  {
+    "file": "forest-hero.jpg",
+    "photographer": "Marvin Zettl",
+    "source": "https://unsplash.com/photos/a-dark-forest-filled-with-lots-of-trees-reoc0yCf67c",
+    "image": "https://images.unsplash.com/photo-1641667838410-b257ca266e38",
+    "license": "https://unsplash.com/license",
+    "use": "Preview atmosphere / sample image; not the site owner photography."
+  },
+  {
+    "file": "forest-detail.jpg",
+    "photographer": "Fethi Benattallah",
+    "source": "https://unsplash.com/photos/tall-trees-in-a-dark-misty-forest-DL50VDF9yy4",
+    "image": "https://images.unsplash.com/photo-1760772484360-b79d2b00eb6f",
+    "license": "https://unsplash.com/license",
+    "use": "Preview atmosphere / sample image; not the site owner photography."
+  },
+  {
+    "file": "coast.jpg",
+    "photographer": "Dylan Crawford",
+    "source": "https://unsplash.com/photos/misty-ocean-waves-crash-over-dark-rocks-UeqVDsvBkUc",
+    "image": "https://images.unsplash.com/photo-1758512521988-a0f6cd25bcb8",
+    "license": "https://unsplash.com/license",
+    "use": "Preview atmosphere / sample image; not the site owner photography."
+  }
+]
