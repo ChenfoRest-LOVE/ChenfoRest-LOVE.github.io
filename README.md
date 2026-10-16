@@ -86,4 +86,4 @@ GitHub 仓库中依次打开 **Settings → Pages**，在 **Build and deployment
 
 国内服务器使用 Nginx 提供相同的静态页面，GitHub `main` 继续作为代码来源。将修改推送到 `main` 后，在已配置专用 SSH 连接的本机运行 `./deploy/publish.ps1` 即可同步；`./deploy/publish.ps1 -Rollback` 可切回上一版。
 
-部署只上传网页、图片和内容索引，每个版本按 Git SHA 独立保存，切换不需要重启服务。国内站点为 [denss.asia](https://denss.asia/)，支持 `www.denss.asia`，HTTP 自动跳转 HTTPS，证书自动续期。正式对外使用仍需完成适用的备案。配置、续期与验收说明见 [deploy/README.md](deploy/README.md)。
+部署只上传网页、图片和内容索引，每个版本按 Git SHA 独立保存，切换不需要重启服务。国内域名为 `denss.asia`，支持 `www.denss.asia`，已配置 HTTP 跳转 HTTPS 和证书自动续期。2026-10-16 观察到腾讯云未备案拦截，当前国内域名不能正常访问，需完成备案后复查；文章和网页代码已部署在服务器上。现可访问 [GitHub Pages](https://chenforest-love.github.io/)。配置、续期与验收说明见 [deploy/README.md](deploy/README.md)。

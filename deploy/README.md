@@ -34,6 +34,8 @@ GitHub `main` 为唯一代码来源。发布脚本在本机获取 `origin/main`�
 
 域名为 `denss.asia` 和 `www.denss.asia`，A 记录指向腾讯云服务器。Let’s Encrypt 证书覆盖两个域名；证书和私钥只保存在服务器 `/etc/letsencrypt/`，不进入仓库或网站目录。
 
+**当前访问状态（2026-10-16 10:39）：腾讯云已拦截未备案域名。** HTTP 返回 302 至腾讯云备案提示页，HTTPS 握手被中途关闭。服务器内部 HTTPS、静态文章与 IP 测试访问正常；已发布的 GitHub Pages 可用。完成备案后再复查公网域名，早前技术验收通过不代表当前仍可从公网访问。
+
 `nginx.conf` 已启用：域名 HTTP 跳转到 `https://denss.asia`，保留路径与查询参数，IP HTTP 与本机发布检查继续可用。云防火墙已允许来源 `0.0.0.0/0` 的 TCP 443，两个域名的公网 HTTPS、五个页面与主要资源已于 2026-10-16 验收通过。新增或迁移实例时，必须先开放端口并验证公网 HTTPS，再启用 HTTP 跳转；放通方法见[腾讯云防火墙说明](https://cloud.tencent.cn/document/product/1207/136745)。
 
 证书使用 Certbot 的 webroot 模式；验证目录为 `/var/lib/chenforest-acme`。HTTP 的 `/.well-known/acme-challenge/` 保留直接访问，不跳转、不受隐藏文件规则阻挡。`certbot.timer` 负责定期检查续期；`reload-nginx-after-renewal.sh` 安装到 `/etc/letsencrypt/renewal-hooks/deploy/reload-chenforest-nginx`，仅在成功续期后检查配置并重载 Nginx。
