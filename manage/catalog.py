@@ -21,6 +21,11 @@ def read_catalog(root):
                 or album['id'] in ids or not all(isinstance(album.get(k), str) for k in ['title', 'english', 'cover'])):
             raise ValueError('图册配置格式无效。')
         ids.add(album['id'])
+        if album.get('protected'):
+            slug = album['id']
+            if (album['cover'] != f'images/{slug}-locked.webp' or album.get('payload') != f'private/{slug}.enc.json'
+                    or type(album.get('count')) is not int or not 0 < album['count'] <= 10000):
+                raise ValueError('受保护图册配置无效。')
     return albums, photos
 
 
@@ -28,8 +33,11 @@ def validate_choice(root, album, file):
     if not isinstance(album, str) or not isinstance(file, str):
         raise ValueError('请选择本图册中的照片。')
     albums, photos = read_catalog(root)
-    if not any(a['id'] == album for a in albums):
+    entry = next((a for a in albums if a['id'] == album), None)
+    if entry is None:
         raise ValueError('图册不存在。')
+    if entry.get('protected'):
+        raise ValueError('加密相册保留模糊封面；修改封面前请先取消密码保护。')
     matches = [p for p in photos if p.get('category') == album and p.get('file') == file]
     if len(matches) != 1 or not re.fullmatch(r'images/[a-z0-9-]+\.(?:webp|jpg|jpeg|png)', file):
         raise ValueError('只能选择本图册中的照片。')
@@ -39,6 +47,12 @@ def validate_choice(root, album, file):
 def render_directory(albums, photos):
     entries = []
     for number, album in enumerate(albums):
+        if album.get('protected'):
+            entries.append(f'''<a class="album-link is-protected" data-album="{album['id']}" data-protected="true" href="content/photos/{album['id']}.html"><figure>
+<div class="album-cover"><img src="content/photos/{album['cover']}" alt="{escape(album['title'], quote=True)}，密码保护的相册" width="384" height="288" loading="{'eager' if number < 2 else 'lazy'}" decoding="async" /><span class="album-lock-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span></div>
+<figcaption><div><h2>{escape(album['title'])}</h2><span class="album-english">{escape(album['english'])}</span></div><span class="album-count">{album['count']:02d} 张 · 密码保护<span aria-hidden="true">↗</span></span></figcaption>
+</figure></a>''')
+            continue
         selected = [p for p in photos if p.get('category') == album['id']]
         matches = [p for p in selected if p.get('file') == album['cover']]
         if len(matches) != 1:

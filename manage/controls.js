@@ -38,7 +38,9 @@
       button.disabled = busy;
       button.title = current ? '可重新发布当前封面到 GitHub' : '将此照片设为图册封面并发布 GitHub';
     });
-    sync.disabled = busy;
+    const protectedAlbum = state.albums.find(a => a.id === grid?.dataset.album)?.protected;
+    sync.disabled = busy || !!protectedAlbum;
+    sync.title = protectedAlbum ? '加密相册保留模糊封面；请通过密码设置管理。' : '';
   }
   async function publish(choice) {
     if (busy || !choice) return;

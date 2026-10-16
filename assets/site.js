@@ -146,7 +146,7 @@ async function hydrateWriting() {
   } catch { showWritingEmpty(container, true); }
 }
 
-function initPhotoGallery() {
+function initPhotoGallery(initialPhotos = null) {
   let photos = [];
   let visiblePhotos = [];
   let activeFilter = 'all';
@@ -303,7 +303,13 @@ function initPhotoGallery() {
     configurePhotoFilters();
     renderPhotos();
   }
-  hydratePhotos();
+  if (Array.isArray(initialPhotos)) {
+    photos = initialPhotos;
+    configurePhotoFilters();
+    renderPhotos();
+  } else {
+    hydratePhotos();
+  }
 }
 if (document.querySelector('#writing-list')) hydrateWriting();
-if (document.querySelector('#photo-grid')) initPhotoGallery();
+if (document.querySelector('#photo-grid') && document.querySelector('#photo-grid').dataset.protected !== 'true') initPhotoGallery();

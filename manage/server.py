@@ -8,11 +8,13 @@ import mimetypes
 import os
 from pathlib import Path, PurePosixPath
 import secrets
+import re
 import subprocess
 import threading
 from urllib.parse import unquote, urlsplit
 
-from catalog import ALBUMS, atomic_write, read_catalog, set_cover, validate_choice
+from catalog import ALBUMS, read_catalog, set_cover, validate_choice
+from privacy import plan_privacy, apply_changes
 
 COVER_FILES = {ALBUMS, 'photos.html'}
 ORIGINS = {'https://github.com/ChenfoRest-LOVE/ChenfoRest-LOVE.github.io.git', 'git@github.com:ChenfoRest-LOVE/ChenfoRest-LOVE.github.io.git'}
@@ -37,8 +39,25 @@ class Publisher:
     def git(self, *args):
         return self.run(['git', '-C', str(self.root), *args])
 
-    def publish(self, album, file):
-        validate_choice(self.root, album, file)
+    def publish_privacy(self, album, action, password, new_password=None):
+        return self.publish(album, privacy=(action, password, new_password))
+
+    def publish_pending(self):
+        return self.publish(None, pending_only=True)
+
+    def pending_allowed(self, paths, subject):
+        if subject.startswith('Set album cover: '):
+            return bool(paths) and paths <= COVER_FILES
+        match = re.fullmatch(r'Set album privacy: ([a-z][a-z0-9-]{0,39})', subject)
+        if not match:
+            return False
+        slug = match[1]
+        fixed = COVER_FILES | {'content/photos/index.json', f'content/photos/{slug}.html', f'content/photos/private/{slug}.enc.json'}
+        return bool(paths) and all(path in fixed or re.fullmatch(r'content/photos/images/[a-z0-9-]+\.(?:webp|jpg|jpeg|png)', path) for path in paths)
+
+    def publish(self, album, file=None, privacy=None, pending_only=False):
+        if not privacy and not pending_only:
+            validate_choice(self.root, album, file)
         step = 'check'
         before = written = None
         before_head = None
@@ -56,22 +75,33 @@ class Publisher:
             for commit in self.git('rev-list', 'origin/main..HEAD').splitlines():
                 paths = set(self.git('diff-tree', '--no-commit-id', '--name-only', '-r', commit).splitlines())
                 subject = self.git('show', '-s', '--format=%s', commit)
-                if not paths or not paths <= COVER_FILES or not subject.startswith('Set album cover: '):
+                if not self.pending_allowed(paths, subject):
                     raise PublishError('check', '本机有尚未发布的其他提交，请先完成当前开发。')
             step = 'save'
             before_head = self.git('rev-parse', 'HEAD')
-            before = {name:(self.root/name).read_text(encoding='utf-8') for name in COVER_FILES}
-            changed = set_cover(self.root, album, file)
+            if privacy:
+                changes = plan_privacy(self.root, album, *privacy)
+                touched = sorted(changes)
+                before = {name:(self.root/name).read_bytes() if (self.root/name).exists() else None for name in touched}
+                apply_changes(self.root, changes)
+                changed = True
+            elif pending_only:
+                touched, changed = [], False
+            else:
+                touched = sorted(COVER_FILES)
+                before = {name:(self.root/name).read_bytes() for name in touched}
+                changed = set_cover(self.root, album, file)
             if changed:
-                written = {name:(self.root/name).read_text(encoding='utf-8') for name in COVER_FILES}
-                self.git('add', '--', ALBUMS, 'photos.html')
+                written = {name:(self.root/name).read_bytes() if (self.root/name).exists() else None for name in touched}
+                self.git('add', '--', *touched)
                 name = self.git('log', '-1', '--format=%an')
                 email = self.git('log', '-1', '--format=%ae')
-                self.git('-c', f'user.name={name}', '-c', f'user.email={email}', 'commit', '--only', '-m', 'Set album cover: ' + album, '--', ALBUMS, 'photos.html')
+                subject = ('Set album privacy: ' if privacy else 'Set album cover: ') + album
+                self.git('-c', f'user.name={name}', '-c', f'user.email={email}', 'commit', '--only', '-m', subject, '--', *touched)
             step = 'push'
             self.git('push', 'origin', 'main')
             revision = self.git('rev-parse', 'HEAD')
-            return {'revision': revision, 'message': '封面已提交 GitHub，腾讯云暂不同步；GitHub Pages 通常需要稍等片刻更新。'}
+            return {'revision': revision, 'message': '已提交 GitHub，腾讯云暂不同步；GitHub Pages 通常需要稍等片刻更新。'}
         except PublishError:
             raise
         except (subprocess.SubprocessError, OSError, RuntimeError) as error:
@@ -80,19 +110,18 @@ class Publisher:
                     # Roll back only our own uncommitted writes. A commit that
                     # completed before a timeout is retained for the next retry.
                     if self.git('rev-parse', 'HEAD') == before_head:
-                        if any((self.root/name).read_text(encoding='utf-8') != text for name,text in written.items()):
+                        if any(((self.root/name).read_bytes() if (self.root/name).exists() else None) != data for name,data in written.items()):
                             raise PublishError('save', '保存期间文件被其他程序修改，已保留现场，请先检查工作区。')
-                        self.git('restore', '--staged', '--', ALBUMS, 'photos.html')
-                        for name, text in before.items():
-                            atomic_write(self.root/name, text)
+                        self.git('restore', '--staged', '--', *touched)
+                        apply_changes(self.root, before)
                 except PublishError:
                     raise
                 except (subprocess.SubprocessError, OSError, RuntimeError):
                     raise PublishError('save', '本地保存失败且无法自动恢复，请检查工作区后重试。') from error
             messages = {'check':'无法检查本机仓库，请确认 Git 可用。',
                         'fetch':'无法同步 GitHub，请检查网络与本机登录状态。',
-                        'save':'无法完成本机封面提交；已保留完成的提交或恢复未提交更改，可重试。',
-                        'push':'封面已保存到本机，GitHub 推送失败；检查网络或登录后可重试。'}
+                        'save':'无法完成本机相册提交；已保留完成的提交或恢复未提交更改，可重试。',
+                        'push':'相册更改已保存到本机，GitHub 推送失败；检查网络或登录后可重试。'}
             raise PublishError(step, messages[step]) from error
 
 
@@ -129,9 +158,9 @@ class Handler(BaseHTTPRequestHandler):
             value = cookies['forest_manager'].value
         except (KeyError, ValueError):
             return False
-        if not hmac.compare_digest(value, self.server.session):
+        if not hmac.compare_digest(value.encode(), self.server.session.encode()):
             return False
-        return not write or (self.headers.get('Origin') == origin and hmac.compare_digest(self.headers.get('X-CSRF-Token', ''), self.server.csrf))
+        return not write or (self.headers.get('Origin') == origin and hmac.compare_digest(self.headers.get('X-CSRF-Token', '').encode(), self.server.csrf.encode()))
 
     def send(self, status, body, content_type='application/json; charset=utf-8', session=False):
         if isinstance(body, dict):
@@ -153,15 +182,15 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(403, {'error':'仅允许本机管理地址。'})
         path = unquote(urlsplit(self.path).path)
         if path == '/_manage/health':
-            return self.send(200, {'app':'forest-cover-manager', 'version':2, 'publicationMode':'github-only'})
+            return self.send(200, {'app':'forest-cover-manager', 'version':3, 'publicationMode':'github-only', 'albumPasswords':True})
         if path == '/_manage/state':
             if not self.authenticated():
                 return self.send(403, {'error':'请从本机管理入口重新打开。'})
             albums, photos = read_catalog(self.server.root)
             return self.send(200, {'albums':albums, 'photos':photos, 'csrf':self.server.csrf})
-        if path == '/_manage/controls.js':
+        if path in ['/_manage/controls.js', '/_manage/privacy-controls.js']:
             # Script contains no credentials; state and writes require the local session.
-            return self.send(200, (Path(__file__).parent/'controls.js').read_bytes(), 'text/javascript; charset=utf-8')
+            return self.send(200, (Path(__file__).parent/path.rsplit('/', 1)[1]).read_bytes(), 'text/javascript; charset=utf-8')
         parts = PurePosixPath(path).parts
         if any(p.startswith('.') for p in parts) or '\\' in path:
             return self.send(404, {'error':'Not found'})
@@ -175,7 +204,7 @@ class Handler(BaseHTTPRequestHandler):
         if target.suffix == '.html':
             html = body.decode('utf-8')
             if relative == 'photos.html' or relative.startswith('content/photos/'):
-                html = html.replace('</head>', '<script src="/_manage/controls.js" defer></script></head>')
+                html = html.replace('</head>', '<script src="/_manage/controls.js" defer></script><script src="/_manage/privacy-controls.js" defer></script></head>')
             body = html.encode('utf-8')
             kind = 'text/html; charset=utf-8'
         return self.send(200, body, kind, session=target.suffix=='.html')
@@ -183,7 +212,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.authenticated(write=True):
             return self.send(403, {'error':'管理会话已失效，请从本机管理入口重新打开。'})
-        if self.path != '/_manage/cover':
+        if self.path not in ['/_manage/cover', '/_manage/privacy', '/_manage/publish']:
             return self.send(404, {'error':'Not found'})
         if self.headers.get('Content-Type', '').split(';')[0] != 'application/json':
             return self.send(415, {'error':'请求格式无效。'})
@@ -192,20 +221,40 @@ class Handler(BaseHTTPRequestHandler):
             if not 0 < length <= 4096:
                 return self.send(413, {'error':'请求大小无效。'})
             data = json.loads(self.rfile.read(length).decode('utf-8'))
-            if not isinstance(data, dict) or set(data) != {'album','file'}:
+            if not isinstance(data, dict):
                 raise ValueError('请求格式无效。')
-            validate_choice(self.server.root, data['album'], data['file'])
+            if self.path == '/_manage/cover':
+                if set(data) != {'album','file'}:
+                    raise ValueError('请求格式无效。')
+                validate_choice(self.server.root, data['album'], data['file'])
+            elif self.path == '/_manage/privacy':
+                if not {'album','action','password'} <= set(data) or set(data) - {'album','action','password','newPassword','confirm'}:
+                    raise ValueError('请求格式无效。')
+                if data['action'] not in ['lock','password','unlock']:
+                    raise ValueError('请求格式无效。')
+                expected = data.get('newPassword') if data['action'] == 'password' else data['password']
+                if data['action'] != 'unlock' and data.get('confirm') != expected:
+                    return self.send(422, {'error':'两次输入的密码不一致。'})
+            elif data:
+                raise ValueError('请求格式无效。')
         except (ValueError, TypeError, UnicodeDecodeError):
             return self.send(422, {'error':'请选择本图册中有效的照片。'})
         if not self.server.publish_lock.acquire(blocking=False):
             return self.send(409, {'error':'正在发布另一项封面更改，请稍候。'})
         try:
-            result = self.server.publisher.publish(data['album'], data['file'])
+            if self.path == '/_manage/privacy':
+                result = self.server.publisher.publish_privacy(data['album'], data['action'], data['password'], data.get('newPassword'))
+            elif self.path == '/_manage/publish':
+                result = self.server.publisher.publish_pending()
+            else:
+                result = self.server.publisher.publish(data['album'], data['file'])
             self.send(200, {'ok':True, **result})
         except PublishError as error:
             self.send(409 if error.step=='check' else 502, {'error':str(error), 'step':error.step})
-        except (ValueError, OSError):
-            self.send(422, {'error':'封面配置无法保存，请检查本机工作区。'})
+        except ValueError as error:
+            self.send(422, {'error':str(error)})
+        except (OSError, ImportError):
+            self.send(422, {'error':'配置无法保存，请检查本机工作区与 Pillow、cryptography 依赖。'})
         finally:
             self.server.publish_lock.release()
 

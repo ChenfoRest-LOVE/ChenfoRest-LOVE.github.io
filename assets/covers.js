@@ -13,6 +13,7 @@
     const [settings, photos] = await Promise.all(responses.map(response => response.json()));
     if (!settings.covers || !Array.isArray(photos)) return;
     for (const link of links) {
+      if (link.dataset.protected === 'true') continue;
       const photo = photos.find(item => item.category === link.dataset.album && item.file === settings.covers[link.dataset.album]);
       if (!photo || !/^images\/[a-z0-9-]+\.(webp|jpg|jpeg|png)$/.test(photo.thumbnail || photo.file)) continue;
       const image = link.querySelector('img');

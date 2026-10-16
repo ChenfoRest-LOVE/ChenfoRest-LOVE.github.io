@@ -17,8 +17,14 @@ if ($Stop) {
 if ($listener) {
     $health = Invoke-RestMethod "$url/_manage/health" -TimeoutSec 3
     if ($health.app -ne 'forest-cover-manager') { throw '4180 端口由其他程序使用。' }
-    Write-Host "封面管理：$url/photos.html"
-    exit 0
+    if ($health.version -ge 3) {
+        Write-Host "封面管理：$url/photos.html"
+        exit 0
+    }
+    $managerProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $($listener.OwningProcess)"
+    if ($managerProcess.CommandLine -notlike "*$scriptPath*") { throw '旧版管理入口由其他程序启动，未停止它。' }
+    Stop-Process -Id $listener.OwningProcess
+    Start-Sleep -Milliseconds 300
 }
 $python = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
 if (-not (Test-Path -LiteralPath $python)) { $python = (Get-Command python -ErrorAction Stop).Source }

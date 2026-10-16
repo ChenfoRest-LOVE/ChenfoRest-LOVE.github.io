@@ -165,6 +165,22 @@ class AccessTests(Fixture):
         finally:
             self.server.publish_lock.release()
 
+    def test_privacy_requires_same_local_session_and_matching_confirmation(self):
+        data={'album':'companions','action':'lock','password':'Long-fixture-passphrase-2026!','confirm':'Long-fixture-passphrase-2026!'}
+        self.assertEqual(self.request('POST','/_manage/privacy',data)[0],403)
+        self.assertEqual(self.request('POST','/_manage/privacy',{**data,'confirm':'different'},self.auth())[0],422)
+        self.publisher.publish_privacy.assert_not_called()
+        self.publisher.publish_privacy.return_value={'revision':'a'*40}
+        self.assertEqual(self.request('POST','/_manage/privacy',data,self.auth())[0],200)
+        self.publisher.publish_privacy.assert_called_once_with('companions','lock',data['password'],None)
+
+    def test_retry_push_is_authenticated_and_cannot_accept_unrelated_data(self):
+        self.publisher.publish_pending.return_value={'revision':'a'*40}
+        self.assertEqual(self.request('POST','/_manage/publish',{}, {})[0],403)
+        self.assertEqual(self.request('POST','/_manage/publish',{'command':'arbitrary'},self.auth())[0],422)
+        self.assertEqual(self.request('POST','/_manage/publish',{},self.auth())[0],200)
+        self.publisher.publish_pending.assert_called_once_with()
+
     def test_cannot_bind_to_public_interface(self):
         with self.assertRaises(ValueError):
             ManagerServer(('0.0.0.0', 0), self.root, self.publisher)

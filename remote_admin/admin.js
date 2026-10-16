@@ -21,6 +21,10 @@
       const title = document.createElement('h2'); title.textContent = album.title;
       const english = document.createElement('small'); english.textContent = album.english; heading.append(title, english);
       const choices = document.createElement('div'); choices.className = 'choices';
+      if (album.protected) {
+        const note = document.createElement('p'); note.className = 'hint'; note.textContent = '密码保护中，封面保持模糊。密码设置请在本机 GitHub 管理入口处理。';
+        section.append(heading, note); $('albums').append(section); continue;
+      }
       const photos = data.photos.filter(photo => photo.category === album.id);
       for (const [i, photo] of photos.entries()) {
         if (!/^images\/[a-z0-9-]+\.(webp|jpg|jpeg|png)$/.test(photo.thumbnail || photo.file)) continue;
