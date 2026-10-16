@@ -30,7 +30,7 @@ python -m http.server 4173 --bind 127.0.0.1
 
 ## 预览影像来源
 
-这些是版式示例，**不是陈炳奇的摄影作品**。图片已保存在本地，完整来源记录在 `assets/images/credits.json`。
+下表为首页氛围图及保留的版式示例素材，**不是陈炳奇的摄影作品**，不属于现有四个个人图册。图片已保存在本地，完整来源记录在 `assets/images/credits.json`。
 
 | 文件 | 摄影师 | 原始页面 |
 | --- | --- | --- |
@@ -38,7 +38,7 @@ python -m http.server 4173 --bind 127.0.0.1
 | forest-detail.jpg | Fethi Benattallah | [高树与雾](https://unsplash.com/photos/tall-trees-in-a-dark-misty-forest-DL50VDF9yy4) |
 | coast.jpg | Dylan Crawford | [海岸与礁石](https://unsplash.com/photos/misty-ocean-waves-crash-over-dark-rocks-UeqVDsvBkUc) |
 
-图片遵循 [Unsplash License](https://unsplash.com/license)。更换首屏图片 `assets/images/forest-hero.jpg` 时同步更新署名。照片索引为空时展示示例；加入有效个人照片后自动替换示例画廊。
+图片遵循 [Unsplash License](https://unsplash.com/license)。更换首屏图片 `assets/images/forest-hero.jpg` 时同步更新署名。影像模块已使用用户提供的五张照片，分为哈尔滨、嫩江、良友佳侣和个人四册；加载失败时显示提示，不会混入示例图片。
 
 日常更新可将开发分支推送并创建 Pull Request，审阅后合并到 `main`。仓库启用 Pages 分支发布后，`main` 的更新会触发网站部署。不要提交服务器密码、令牌或密钥。
 
@@ -63,20 +63,27 @@ python -m http.server 4173 --bind 127.0.0.1
 
 ## 新增摄影
 
-1. 将图片上传到 `content/photos/`，例如 `xiamen-sunset.jpg`。
+1. 将图片上传到 `content/photos/images/`，生成清晰图和较小的预览图。
 2. 在 `content/photos/index.json` 中加入一条记录：
 
 ```json
 [
   {
-    "file": "xiamen-sunset.jpg",
+    "file": "images/xiamen-sunset-full.webp",
+    "thumbnail": "images/xiamen-sunset-thumb.webp",
+    "width": 1920,
+    "height": 1280,
     "alt": "厦门的傍晚",
-    "caption": "厦门 · 2026"
+    "caption": "傍晚",
+    "category": "personal",
+    "categoryLabel": "个人"
   }
 ]
 ```
 
-摄影可增加可选 `category` 字段进行分类；原有三个字段保持兼容。推荐将单张图片压缩到 2 MB 以内。写作和摄影记录均按最新内容放在数组最前面。以上仅为数据格式示例，不代表已有作品。文件路径只使用各自内容目录内的相对路径。文章 HTML 需自带阅读样式。
+`photos.html` 展示四个图册封面，点击后进入 `content/photos/harbin.html`、`nenjiang.html`、`companions.html` 或 `personal.html`。图册页根据 `data-album` 筛选索引，预览图用于页面加载，点击后加载清晰图；单册内支持键盘翻页和原比例预览。添加照片时同步更新封面页和对应册页的数量与无 JavaScript 备用内容。新增图册可沿用现有册页结构。
+
+`thumbnail`、`width`、`height` 为建议字段，原有 `file`、`alt`、`caption` 三字段保持兼容；尺寸应为清晰图的真实像素。推荐清晰图长边不超过 2560 像素且单张小于 2 MB，不放大低分辨率照片。发布图已统一色彩并去除原始元数据。当前五张图片没有可用拍摄日期或 GPS，地点与图册由用户确认，未编造时间或人物关系。示例 JSON 仅说明格式。文件路径只使用对应内容目录内的相对路径。文章 HTML 需自带阅读样式。
 
 ## 开启发布
 

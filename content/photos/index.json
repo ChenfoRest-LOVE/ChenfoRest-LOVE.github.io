@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "file": "images/night-tower-full.webp",
+    "thumbnail": "images/night-tower-thumb.webp",
+    "width": 1706,
+    "height": 1279,
+    "alt": "夜色中的哈尔滨龙塔，前景是正在播放音乐的屏幕",
+    "caption": "龙塔夜色",
+    "category": "harbin",
+    "categoryLabel": "哈尔滨"
+  },
+  {
+    "file": "images/river-sunset-full.webp",
+    "thumbnail": "images/river-sunset-thumb.webp",
+    "width": 1707,
+    "height": 1280,
+    "alt": "嫩江江面的日落，金色余晖映着江水与沿岸灯火",
+    "caption": "江上暮色",
+    "category": "nenjiang",
+    "categoryLabel": "嫩江"
+  },
+  {
+    "file": "images/friends-table-full.webp",
+    "thumbnail": "images/friends-table-thumb.webp",
+    "width": 2368,
+    "height": 1279,
+    "alt": "四人在餐桌旁的合影",
+    "caption": "围坐",
+    "category": "companions",
+    "categoryLabel": "良友佳侣"
+  },
+  {
+    "file": "images/friends-evening-full.webp",
+    "thumbnail": "images/friends-evening-thumb.webp",
+    "width": 2560,
+    "height": 1466,
+    "alt": "暖色灯光下，两人在餐厅里的合影",
+    "caption": "同席",
+    "category": "companions",
+    "categoryLabel": "良友佳侣"
+  },
+  {
+    "file": "images/station-departure-full.webp",
+    "thumbnail": "images/station-departure-thumb.webp",
+    "width": 689,
+    "height": 388,
+    "alt": "第一次来到厦门大学时，携行李站在入口前的身影",
+    "caption": "初到厦大",
+    "category": "personal",
+    "categoryLabel": "个人"
+  }
+]

@@ -147,11 +147,6 @@ async function hydrateWriting() {
 }
 
 function initPhotoGallery() {
-  const samplePhotos = [
-    { src: 'assets/images/forest-hero.jpg', alt: '雾中的森林小径', caption: '林径', category: 'forest', credit: '示例影像 · Marvin Zettl / Unsplash', width: 2400, height: 3223 },
-    { src: 'assets/images/forest-detail.jpg', alt: '薄雾中层层延伸的深绿色森林树木', caption: '雾林', category: 'forest', credit: '示例影像 · Fethi Benattallah / Unsplash', width: 1400, height: 2100 },
-    { src: 'assets/images/coast.jpg', alt: '海浪与海岸相遇的自然景色', caption: '礁岸', category: 'coast', credit: '示例影像 · Dylan Crawford / Unsplash', width: 1400, height: 788 }
-  ];
   let photos = [];
   let visiblePhotos = [];
   let activeFilter = 'all';
@@ -227,12 +222,13 @@ function initPhotoGallery() {
     const fragment = document.createDocumentFragment();
     visiblePhotos.forEach((photo, index) => {
       const figure = element('figure', 'reveal');
+      figure.style.setProperty('--photo-width', `${Math.min(photo.width, 1100)}px`);
       const button = element('button', 'photo-media');
       button.type = 'button';
       button.setAttribute('aria-label', `放大查看：${photo.caption || photo.alt || '影像'}`);
       button.setAttribute('aria-haspopup', 'dialog');
       const image = element('img');
-      image.src = photo.src;
+      image.src = photo.thumbnail || photo.src;
       image.alt = photo.alt;
       image.loading = 'lazy';
       image.decoding = 'async';
@@ -258,10 +254,10 @@ function initPhotoGallery() {
     photoStatus.textContent = photoLoadWarning || (announce ? `显示 ${visiblePhotos.length} 张影像` : '');
     revealElements(photoGrid);
   }
-  function configurePhotoFilters(personal = false) {
+  function configurePhotoFilters() {
     const filterGroup = document.querySelector('.photo-filters');
     const categories = new Map([['all', '全部']]);
-    photos.forEach(photo => categories.set(photo.category, personal ? photo.categoryLabel : photo.category === 'forest' ? '森林' : '海岸'));
+    photos.forEach(photo => categories.set(photo.category, photo.categoryLabel));
     const fragment = document.createDocumentFragment();
     categories.forEach((label, value) => {
       const button = element('button', '', label);
@@ -279,29 +275,31 @@ function initPhotoGallery() {
     filterGroup.replaceChildren(fragment);
   }
   async function hydratePhotos() {
-    let personal = false;
     try {
-      const data = await readIndex('content/photos/index.json');
+      const all = await readIndex(photoGrid.dataset.index || 'content/photos/index.json');
+      const data = photoGrid.dataset.album ? all.filter(item => item && item.category === photoGrid.dataset.album) : all;
+      const directory = photoGrid.dataset.root || 'content/photos/';
       if (!data.length) {
-        photos = samplePhotos;
-        document.querySelector('#photo-note').textContent = '以下为 Unsplash 示例影像，非个人摄影作品。';
+        photos = [];
+        photoLoadWarning = '暂无影像。';
       } else {
-        personal = true;
         photos = data.flatMap(item => {
           if (!item || typeof item.alt !== 'string' || typeof item.caption !== 'string') return [];
-          const src = localContentPath('content/photos/', item.file, /\.(?:jpe?g|png|webp|avif|gif|svg)$/i);
-          const categoryLabel = typeof item.category === 'string' && item.category.trim() ? item.category.trim() : '未分类';
-          return src ? [{ src, alt: item.alt, caption: item.caption, category: `personal:${categoryLabel}`, categoryLabel, width: 1600, height: 1100 }] : [];
+          const src = localContentPath(directory, item.file, /\.(?:jpe?g|png|webp|avif|gif|svg)$/i);
+          const thumbnail = localContentPath(directory, item.thumbnail, /\.(?:jpe?g|png|webp|avif|gif|svg)$/i);
+          const category = typeof item.category === 'string' && item.category.trim() ? item.category.trim() : 'uncategorized';
+          const categoryLabel = typeof item.categoryLabel === 'string' ? item.categoryLabel : category;
+          const width = Number.isInteger(item.width) && item.width > 0 && item.width <= 20000 ? item.width : 1600;
+          const height = Number.isInteger(item.height) && item.height > 0 && item.height <= 20000 ? item.height : 1100;
+          return src ? [{ src, thumbnail, alt: item.alt, caption: item.caption, category, categoryLabel, width, height }] : [];
         });
-        document.querySelector('#photo-note').textContent = '个人影像集';
         if (photos.length < data.length) photoLoadWarning = '部分影像条目信息不完整，暂时无法显示。';
       }
     } catch {
-      photos = samplePhotos;
-      photoLoadWarning = '个人影像暂未能加载，以下展示示例影像。';
-      document.querySelector('#photo-note').textContent = 'Unsplash 示例影像，非个人摄影作品。';
+      photos = [];
+      photoLoadWarning = '影像加载失败，请刷新重试。';
     }
-    configurePhotoFilters(personal);
+    configurePhotoFilters();
     renderPhotos();
   }
   hydratePhotos();
