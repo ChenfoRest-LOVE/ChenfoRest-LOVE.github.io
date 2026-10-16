@@ -1,6 +1,6 @@
 # 陈炳奇 · Forest 个人网站
 
-深色沉浸式主页，围绕影像、哲学阅读与随笔展开。HTML、CSS 和原生 JavaScript，无需安装依赖或构建。当前本地分支 `codex/immersive-homepage`，本次只本地预览，未推送或部署。
+深色沉浸式个人网站，围绕影像、哲学阅读与随笔展开。HTML、CSS 和原生 JavaScript，无需安装依赖或构建。首页仅展示个人介绍与教育经历，各模块通过独立页面访问，支持 GitHub Pages。
 
 ## 本地预览
 
@@ -40,7 +40,7 @@ python -m http.server 4173 --bind 127.0.0.1
 
 图片遵循 [Unsplash License](https://unsplash.com/license)。更换首屏图片 `assets/images/forest-hero.jpg` 时同步更新署名。照片索引为空时展示示例；加入有效个人照片后自动替换示例画廊。
 
-这是一个无需构建的 GitHub Pages 静态站点。后续确认设计后，可将开发分支推送并创建 Pull Request，审阅后合并到 `main`；是否触发公开发布由仓库 Pages 设置决定。不要提交服务器密码、令牌或密钥。
+日常更新可将开发分支推送并创建 Pull Request，审阅后合并到 `main`。仓库启用 Pages 分支发布后，`main` 的更新会触发网站部署。不要提交服务器密码、令牌或密钥。
 
 页面右上角的主题按钮可在浅色与深色界面间切换；网站会记住访客的选择。语录按钮会轮换显示哲学名著的原文及出处。
 
