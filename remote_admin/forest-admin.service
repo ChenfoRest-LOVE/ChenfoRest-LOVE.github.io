@@ -1,0 +1,32 @@
+[Unit]
+Description=Forest owner-only photo cover administration
+After=network.target
+
+[Service]
+Type=simple
+User=forest-admin
+Group=forest-admin
+WorkingDirectory=/opt/forest-admin
+ExecStart=/usr/bin/python3 -B /opt/forest-admin/server.py --database /var/lib/forest-admin/admin.sqlite --root /var/www/chenforest/current
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/forest-admin
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=600M
+TasksMax=40
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -2,6 +2,8 @@
 
 GitHub `main` 为唯一代码来源。发布脚本在本机获取 `origin/main`，用 `git archive` 只打包五个 HTML、`assets/` 和 `content/`，通过既有 SSH 别名上传。未提交改动、Git 凭据、文档与部署脚本不会进入网站根目录。服务器无需保存 GitHub 写入凭据。
 
+在线封面后台独立部署，账号与封面选择保存在受保护的服务器数据库中；静态发布和回滚均不覆盖该数据库。安装、初始化、备份见 `remote_admin/README.md`。
+
 ## 更新网站
 
 先将代码推送到 GitHub `main`，再在本机 PowerShell 运行：

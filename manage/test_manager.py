@@ -22,6 +22,8 @@ class Fixture(unittest.TestCase):
         for name in ['index.json', 'albums.json']:
             shutil.copyfile(SOURCE / 'content/photos' / name, self.root / 'content/photos' / name)
         shutil.copyfile(SOURCE / 'photos.html', self.root / 'photos.html')
+        # Keep each fixture independent of the owner's currently selected cover.
+        set_cover(self.root, 'companions', 'images/friends-evening-full.webp')
 
     def tearDown(self):
         self.temp.cleanup()

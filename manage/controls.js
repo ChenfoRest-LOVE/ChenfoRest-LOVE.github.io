@@ -17,7 +17,10 @@
   document.head.append(style);
   const bar = node('aside','manager-bar');
   bar.setAttribute('aria-label','封面管理');
-  bar.append(node('strong','','封面管理 · 仅本机'),node('span','','更换后发布到全站。'));
+  bar.append(node('strong','','默认封面 · 仅本机'),node('span','','仅修改仓库默认值；在线管理保存的封面优先。'));
+  const online = node('a','','在线封面管理 ↗');
+  online.href = 'https://denss.asia/admin/';
+  bar.append(online);
   const sync = node('button','manager-action','同步当前封面');
   sync.type = 'button';
   const status = node('p','manager-status');
