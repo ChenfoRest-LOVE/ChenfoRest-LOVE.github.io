@@ -53,12 +53,13 @@ python -m http.server 4173 --bind 127.0.0.1
 [
   {
     "title": "文章标题",
-    "date": "2026.09.07",
-    "summary": "一两句简介。",
+    "date": "2026-09-07",
     "file": "first-note.html"
   }
 ]
 ```
+
+文字目录只显示标题与写作日期，整行点击后进入文章。日期使用 `YYYY-MM-DD`，按最新内容在前排列。正文页可参考 `content/writing/chire.html` 与 `yuemeng.html`，共用 `assets/writing.css`；保留原文段落，按需调整排版。现有两篇文章的写作日期由作者确认，未从文件接收时间推断。
 
 ## 新增摄影
 

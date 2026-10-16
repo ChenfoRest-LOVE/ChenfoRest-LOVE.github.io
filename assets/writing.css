@@ -1,0 +1,49 @@
+/* A quiet index and a continuous reading surface. */
+.writing-main { max-width: 1200px; margin-inline: auto; }
+.writing-index { border-top: 1px solid var(--line); }
+.writing-entry { display: flex; align-items: baseline; justify-content: space-between; gap: 28px; padding: 35px 0; border-bottom: 1px solid var(--line); }
+.writing-entry h2 { font: 400 clamp(25px, 3vw, 35px)/1.5 var(--serif); letter-spacing: .12em; transition: color .25s, transform .25s; }
+.writing-entry time { flex-shrink: 0; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .12em; }
+.writing-entry:hover h2 { color: var(--accent); transform: translateX(5px); }
+.writing-index .content-status { padding: 30px 0; color: var(--muted); font-size: 12px; }
+.essay-page { --reading-serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif; }
+.reading-progress { position: fixed; inset: 0 auto auto 0; width: 100%; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; z-index: 20; pointer-events: none; }
+.essay-main { width: 100%; max-width: 1420px; margin-inline: auto; padding: 45px 7% 100px; }
+.essay-main > .back-link { margin-bottom: 58px; }
+.essay { max-width: 680px; margin-inline: auto; }
+.essay-heading { padding-bottom: 48px; border-bottom: 1px solid var(--line); margin-bottom: 46px; animation: essay-arrive .7s ease both; }
+.essay-heading time { color: var(--muted); font: 11px/1.5 var(--sans); letter-spacing: .16em; font-variant-numeric: tabular-nums; }
+.essay-heading h1 { margin-top: 20px; font: 400 clamp(44px, 6vw, 66px)/1.5 var(--reading-serif); letter-spacing: .18em; }
+.essay-body { font: 400 18px/2.15 var(--reading-serif); letter-spacing: .045em; overflow-wrap: break-word; line-break: strict; }
+.essay-body p { margin: 0 0 1.6em; text-indent: 2em; }
+.essay-body p:last-child { margin-bottom: 0; }
+.essay-end { display: block; width: 24px; height: 1px; background: var(--muted); margin: 60px auto; opacity: .65; }
+.essay-navigation { position: static; max-width: 680px; margin: 0 auto; border-top: 1px solid var(--line); padding: 28px 0 0; display: flex; flex-direction: row; justify-content: space-between; gap: 24px; font-size: 12px; background: none; }
+.essay-navigation a { display: inline-flex; align-items: center; gap: 14px; padding: 0; font-size: inherit; color: var(--muted); transition: color .25s; }
+.essay-navigation a:after { display: none; }
+.essay-page .essay-navigation { border-bottom: 0; backdrop-filter: none; }
+.essay-navigation a:hover { color: var(--ink); }
+.essay-navigation .adjacent-essay { text-align: right; }
+@keyframes essay-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (min-width: 1600px) { .essay { max-width: 720px; } .essay-body { font-size: 19px; } .essay-navigation { max-width: 720px; } }
+@media (max-width: 600px) {
+  .writing-entry { padding: 28px 0; gap: 20px; }
+  .writing-entry time { font-size: 10px; letter-spacing: .06em; }
+  .essay-main { padding: 28px 6% 65px; }
+  .essay-main > .back-link { margin-bottom: 48px; }
+  .essay-heading { padding-bottom: 30px; margin-bottom: 32px; }
+  .essay-heading h1 { font-size: 43px; margin-top: 15px; }
+  .essay-heading time { font-size: 10px; }
+  .essay-body { font-size: 17px; line-height: 2.05; letter-spacing: .025em; }
+  .essay-body p { margin-bottom: 1.45em; }
+  .essay-end { margin-block: 45px; }
+  .essay-navigation { font-size: 11px; padding-top: 23px; }
+}
+@media (prefers-reduced-motion: reduce) { .essay-heading { animation: none; } .writing-entry h2, .essay-navigation a { transition: none; } .writing-entry:hover h2 { transform: none; } }
+@media print {
+  .essay-page { background: white; color: black; }
+  .essay-page > .header, .essay-page > .page-content, .reading-progress, .essay-main > .back-link, .essay-navigation { display: none; }
+  .essay-main { padding: 0; }
+  .essay-body { font-size: 11pt; }
+  .essay-heading { animation: none; break-after: avoid; }
+}

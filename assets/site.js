@@ -130,22 +130,16 @@ async function hydrateWriting() {
     const fragment = document.createDocumentFragment();
     let invalid = 0;
     data.forEach(item => {
-      if (!item || typeof item.title !== 'string' || typeof item.date !== 'string' || typeof item.summary !== 'string') { invalid++; return; }
+      if (!item || typeof item.title !== 'string' || typeof item.date !== 'string') { invalid++; return; }
       const href = localContentPath('content/writing/', item.file, /\.(?:html?|md|pdf|txt)$/i);
       if (!href) { invalid++; return; }
-      const article = element('article');
-      const time = element('time', '', item.date);
-      if (/^\d{4}-\d{2}-\d{2}$/.test(item.date)) time.dateTime = item.date;
-      const content = element('div');
-      const heading = element('h3');
-      const link = element('a', '', item.title);
+      const link = element('a', 'writing-entry');
       link.href = href;
-      heading.append(link);
-      content.append(heading, element('p', '', item.summary));
-      const arrow = element('span', 'article-arrow', '↗');
-      arrow.setAttribute('aria-hidden', 'true');
-      article.append(time, content, arrow);
-      fragment.append(article);
+      const heading = element('h2', '', item.title);
+      const time = element('time', '', item.date.replaceAll('-', '.'));
+      if (/^\d{4}-\d{2}-\d{2}$/.test(item.date)) time.dateTime = item.date;
+      link.append(heading, time);
+      fragment.append(link);
     });
     container.replaceChildren(fragment);
     if (invalid) container.append(element('p', 'content-status', '部分文章条目信息不完整，暂时无法显示。'));
