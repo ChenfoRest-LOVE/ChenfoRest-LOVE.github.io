@@ -12,6 +12,8 @@ GitHub `main` 为唯一代码来源。发布脚本在本机获取 `origin/main`�
 
 此命令是手动发布，没有定时轮询。需要本机已配置 `ssh xmu-server` 和专用 SSH 密钥；私钥不属于仓库。
 
+封面管理会使用 `-Revision <完整 Git SHA>` 固定本次发布版本；若获取到的 `origin/main` 已改变，脚本会在上传前停止，避免发布其他版本。常规手动发布不传此参数时，继续发布最新的 `origin/main`。
+
 ## 服务结构
 
 - Nginx 通过 `/var/www/chenforest/current` 提供静态文件，开机启动。

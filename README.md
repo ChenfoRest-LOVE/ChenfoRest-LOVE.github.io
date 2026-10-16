@@ -83,6 +83,8 @@ python -m http.server 4173 --bind 127.0.0.1
 
 `photos.html` 展示四个图册封面，点击后进入 `content/photos/harbin.html`、`nenjiang.html`、`companions.html` 或 `personal.html`。图册页根据 `data-album` 筛选索引，预览图用于页面加载，点击后加载清晰图；单册内支持键盘翻页和原比例预览。添加照片时同步更新封面页和对应册页的数量与无 JavaScript 备用内容。新增图册可沿用现有册页结构。
 
+封面配置保存在 `content/photos/albums.json`。更换全站封面可运行 `./manage/start.ps1`，从仅本机可访问的管理页进入相册并点击“设为封面”；会通过现有 GitHub 与 SSH 发布流程同步到网站。公开页面没有管理按钮。详见 [封面管理说明](manage/README.md)。
+
 `thumbnail`、`width`、`height` 为建议字段，原有 `file`、`alt`、`caption` 三字段保持兼容；尺寸应为清晰图的真实像素。推荐清晰图长边不超过 2560 像素且单张小于 2 MB，不放大低分辨率照片。发布图已统一色彩并去除原始元数据。当前五张图片没有可用拍摄日期或 GPS，地点与图册由用户确认，未编造时间或人物关系。示例 JSON 仅说明格式。文件路径只使用对应内容目录内的相对路径。文章 HTML 需自带阅读样式。
 
 ## 开启发布

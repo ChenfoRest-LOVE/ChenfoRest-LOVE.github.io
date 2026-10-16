@@ -225,6 +225,7 @@ function initPhotoGallery() {
       figure.style.setProperty('--photo-width', `${Math.min(photo.width, 1100)}px`);
       const button = element('button', 'photo-media');
       button.type = 'button';
+      button.dataset.photoFile = photo.file;
       button.setAttribute('aria-label', `放大查看：${photo.caption || photo.alt || '影像'}`);
       button.setAttribute('aria-haspopup', 'dialog');
       const image = element('img');
@@ -291,7 +292,7 @@ function initPhotoGallery() {
           const categoryLabel = typeof item.categoryLabel === 'string' ? item.categoryLabel : category;
           const width = Number.isInteger(item.width) && item.width > 0 && item.width <= 20000 ? item.width : 1600;
           const height = Number.isInteger(item.height) && item.height > 0 && item.height <= 20000 ? item.height : 1100;
-          return src ? [{ src, thumbnail, alt: item.alt, caption: item.caption, category, categoryLabel, width, height }] : [];
+          return src ? [{ src, thumbnail, file: item.file, alt: item.alt, caption: item.caption, category, categoryLabel, width, height }] : [];
         });
         if (photos.length < data.length) photoLoadWarning = '部分影像条目信息不完整，暂时无法显示。';
       }

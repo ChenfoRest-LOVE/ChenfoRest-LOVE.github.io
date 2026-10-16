@@ -1,0 +1,26 @@
+[
+  {
+    "id": "harbin",
+    "title": "哈尔滨",
+    "english": "HARBIN",
+    "cover": "images/night-tower-full.webp"
+  },
+  {
+    "id": "nenjiang",
+    "title": "嫩江",
+    "english": "NENJIANG",
+    "cover": "images/river-sunset-full.webp"
+  },
+  {
+    "id": "companions",
+    "title": "良友佳侣",
+    "english": "COMPANIONS",
+    "cover": "images/friends-evening-full.webp"
+  },
+  {
+    "id": "personal",
+    "title": "个人",
+    "english": "PERSONAL",
+    "cover": "images/station-departure-full.webp"
+  }
+]
