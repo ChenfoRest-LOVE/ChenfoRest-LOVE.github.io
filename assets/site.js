@@ -8,7 +8,7 @@ const quotes = [
   { text: 'Ὅτι οὐ τὰ πράγματα ταράσσει τοὺς ἀνθρώπους, ἀλλὰ τὰ περὶ τῶν πραγμάτων δόγματα.', source: 'Epictetus · Enchiridion' }
 ];
 let quoteIndex = 0;
-document.querySelector('#quote button').addEventListener('click', () => {
+document.querySelector('#quote button')?.addEventListener('click', () => {
   quoteIndex = (quoteIndex + 1) % quotes.length;
   document.querySelector('#quote p').textContent = quotes[quoteIndex].text;
   document.querySelector('#quote cite').textContent = quotes[quoteIndex].source;
@@ -70,10 +70,11 @@ let scrollFrame = 0;
 const hero = document.querySelector('.hero');
 function updateDepth() {
   scrollFrame = 0;
+  if (!hero) return;
   hero.style.setProperty('--hero-offset', reducedMotion.matches ? '0px' : `${Math.min(window.scrollY * .12, 80)}px`);
 }
 window.addEventListener('scroll', () => {
-  if (!scrollFrame && window.scrollY < hero.offsetHeight + 100) scrollFrame = requestAnimationFrame(updateDepth);
+  if (hero && !scrollFrame && window.scrollY < hero.offsetHeight + 100) scrollFrame = requestAnimationFrame(updateDepth);
 }, { passive: true });
 reducedMotion.addEventListener('change', () => {
   updateDepth();
@@ -151,162 +152,165 @@ async function hydrateWriting() {
   } catch { showWritingEmpty(container, true); }
 }
 
-const samplePhotos = [
-  { src: 'assets/images/forest-hero.jpg', alt: '雾中的森林小径', caption: '林径', category: 'forest', credit: '示例影像 · Marvin Zettl / Unsplash', width: 2400, height: 3223 },
-  { src: 'assets/images/forest-detail.jpg', alt: '薄雾中层层延伸的深绿色森林树木', caption: '雾林', category: 'forest', credit: '示例影像 · Fethi Benattallah / Unsplash', width: 1400, height: 2100 },
-  { src: 'assets/images/coast.jpg', alt: '海浪与海岸相遇的自然景色', caption: '礁岸', category: 'coast', credit: '示例影像 · Dylan Crawford / Unsplash', width: 1400, height: 788 }
-];
-let photos = [];
-let visiblePhotos = [];
-let activeFilter = 'all';
-let lightboxIndex = 0;
-let lightboxTrigger;
-const photoGrid = document.querySelector('#photo-grid');
-const photoStatus = document.querySelector('#photo-status');
-const lightbox = document.querySelector('.lightbox');
-const lightboxImage = document.querySelector('#lightbox-image');
-const lightboxStatus = element('p', 'lightbox-status');
-lightboxStatus.setAttribute('role', 'status');
-lightboxStatus.setAttribute('aria-live', 'polite');
-lightboxStatus.setAttribute('aria-atomic', 'true');
-lightboxImage.before(lightboxStatus);
-const lightboxCaption = document.querySelector('#lightbox-caption');
-const lightboxCounter = document.querySelector('#lightbox-counter');
-const previousButton = document.querySelector('.lightbox-prev');
-const nextButton = document.querySelector('.lightbox-next');
-let photoLoadWarning = '';
+function initPhotoGallery() {
+  const samplePhotos = [
+    { src: 'assets/images/forest-hero.jpg', alt: '雾中的森林小径', caption: '林径', category: 'forest', credit: '示例影像 · Marvin Zettl / Unsplash', width: 2400, height: 3223 },
+    { src: 'assets/images/forest-detail.jpg', alt: '薄雾中层层延伸的深绿色森林树木', caption: '雾林', category: 'forest', credit: '示例影像 · Fethi Benattallah / Unsplash', width: 1400, height: 2100 },
+    { src: 'assets/images/coast.jpg', alt: '海浪与海岸相遇的自然景色', caption: '礁岸', category: 'coast', credit: '示例影像 · Dylan Crawford / Unsplash', width: 1400, height: 788 }
+  ];
+  let photos = [];
+  let visiblePhotos = [];
+  let activeFilter = 'all';
+  let lightboxIndex = 0;
+  let lightboxTrigger;
+  const photoGrid = document.querySelector('#photo-grid');
+  const photoStatus = document.querySelector('#photo-status');
+  const lightbox = document.querySelector('.lightbox');
+  const lightboxImage = document.querySelector('#lightbox-image');
+  const lightboxStatus = element('p', 'lightbox-status');
+  lightboxStatus.setAttribute('role', 'status');
+  lightboxStatus.setAttribute('aria-live', 'polite');
+  lightboxStatus.setAttribute('aria-atomic', 'true');
+  lightboxImage.before(lightboxStatus);
+  const lightboxCaption = document.querySelector('#lightbox-caption');
+  const lightboxCounter = document.querySelector('#lightbox-counter');
+  const previousButton = document.querySelector('.lightbox-prev');
+  const nextButton = document.querySelector('.lightbox-next');
+  let photoLoadWarning = '';
 
-lightboxImage.addEventListener('load', () => {
-  lightboxStatus.textContent = '';
-  lightboxImage.hidden = false;
-});
-lightboxImage.addEventListener('error', () => {
-  lightboxImage.hidden = true;
-  lightboxStatus.textContent = '影像暂时无法加载。可切换至其他影像，或关闭预览后重试。';
-});
+  lightboxImage.addEventListener('load', () => {
+    lightboxStatus.textContent = '';
+    lightboxImage.hidden = false;
+  });
+  lightboxImage.addEventListener('error', () => {
+    lightboxImage.hidden = true;
+    lightboxStatus.textContent = '影像暂时无法加载。可切换至其他影像，或关闭预览后重试。';
+  });
 
-function showLightboxPhoto() {
-  const photo = visiblePhotos[lightboxIndex];
-  if (!photo) return;
-  lightboxImage.hidden = true;
-  lightboxStatus.textContent = '正在加载影像…';
-  lightboxImage.alt = photo.alt;
-  lightboxImage.width = photo.width;
-  lightboxImage.height = photo.height;
-  lightboxImage.src = photo.src;
-  lightboxCaption.textContent = [photo.caption, photo.credit].filter(Boolean).join(' · ');
-  lightboxCounter.textContent = `${String(lightboxIndex + 1).padStart(2, '0')} / ${String(visiblePhotos.length).padStart(2, '0')}`;
-  previousButton.disabled = nextButton.disabled = visiblePhotos.length < 2;
-}
-function openLightbox(index, trigger) {
-  lightboxIndex = index;
-  lightboxTrigger = trigger;
-  showLightboxPhoto();
-  lightbox.showModal();
-  document.body.classList.add('dialog-open');
-  document.querySelector('.lightbox-close').focus();
-}
-function stepLightbox(direction) {
-  if (!visiblePhotos.length) return;
-  lightboxIndex = (lightboxIndex + direction + visiblePhotos.length) % visiblePhotos.length;
-  showLightboxPhoto();
-}
-document.querySelector('.lightbox-close').addEventListener('click', () => lightbox.close());
-previousButton.addEventListener('click', () => stepLightbox(-1));
-nextButton.addEventListener('click', () => stepLightbox(1));
-lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
-lightbox.addEventListener('close', () => {
-  document.body.classList.remove('dialog-open');
-  if (lightboxTrigger && lightboxTrigger.isConnected) lightboxTrigger.focus({ preventScroll: true });
-});
-lightbox.addEventListener('keydown', event => {
-  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-    event.preventDefault();
-    stepLightbox(event.key === 'ArrowLeft' ? -1 : 1);
+  function showLightboxPhoto() {
+    const photo = visiblePhotos[lightboxIndex];
+    if (!photo) return;
+    lightboxImage.hidden = true;
+    lightboxStatus.textContent = '正在加载影像…';
+    lightboxImage.alt = photo.alt;
+    lightboxImage.width = photo.width;
+    lightboxImage.height = photo.height;
+    lightboxImage.src = photo.src;
+    lightboxCaption.textContent = [photo.caption, photo.credit].filter(Boolean).join(' · ');
+    lightboxCounter.textContent = `${String(lightboxIndex + 1).padStart(2, '0')} / ${String(visiblePhotos.length).padStart(2, '0')}`;
+    previousButton.disabled = nextButton.disabled = visiblePhotos.length < 2;
   }
-});
-
-function renderPhotos(announce = false) {
-  visiblePhotos = photos.filter(photo => activeFilter === 'all' || photo.category === activeFilter);
-  const fragment = document.createDocumentFragment();
-  visiblePhotos.forEach((photo, index) => {
-    const figure = element('figure', 'reveal');
-    const button = element('button', 'photo-media');
-    button.type = 'button';
-    button.setAttribute('aria-label', `放大查看：${photo.caption || photo.alt || '影像'}`);
-    button.setAttribute('aria-haspopup', 'dialog');
-    const image = element('img');
-    image.src = photo.src;
-    image.alt = photo.alt;
-    image.loading = 'lazy';
-    image.decoding = 'async';
-    image.width = photo.width;
-    image.height = photo.height;
-    image.addEventListener('error', () => {
-      photoStatus.textContent = '部分影像暂时无法加载，请稍后刷新页面。';
-      button.disabled = true;
-    }, { once: true });
-    const open = element('span', 'photo-open', '↗');
-    open.setAttribute('aria-hidden', 'true');
-    button.append(image, open);
-    button.addEventListener('click', () => openLightbox(index, button));
-    const caption = element('figcaption');
-    const name = element('span', 'photo-name');
-    name.append(element('span', 'photo-number', String(index + 1).padStart(2, '0')), document.createTextNode(photo.caption || photo.alt || '影像'));
-    caption.append(name);
-    if (photo.credit) caption.append(element('span', 'photo-credit', photo.credit));
-    figure.append(button, caption);
-    fragment.append(figure);
+  function openLightbox(index, trigger) {
+    lightboxIndex = index;
+    lightboxTrigger = trigger;
+    showLightboxPhoto();
+    lightbox.showModal();
+    document.body.classList.add('dialog-open');
+    document.querySelector('.lightbox-close').focus();
+  }
+  function stepLightbox(direction) {
+    if (!visiblePhotos.length) return;
+    lightboxIndex = (lightboxIndex + direction + visiblePhotos.length) % visiblePhotos.length;
+    showLightboxPhoto();
+  }
+  document.querySelector('.lightbox-close').addEventListener('click', () => lightbox.close());
+  previousButton.addEventListener('click', () => stepLightbox(-1));
+  nextButton.addEventListener('click', () => stepLightbox(1));
+  lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
+  lightbox.addEventListener('close', () => {
+    document.body.classList.remove('dialog-open');
+    if (lightboxTrigger && lightboxTrigger.isConnected) lightboxTrigger.focus({ preventScroll: true });
   });
-  photoGrid.replaceChildren(fragment);
-  photoStatus.textContent = photoLoadWarning || (announce ? `显示 ${visiblePhotos.length} 张影像` : '');
-  revealElements(photoGrid);
-}
-function configurePhotoFilters(personal = false) {
-  const filterGroup = document.querySelector('.photo-filters');
-  const categories = new Map([['all', '全部']]);
-  photos.forEach(photo => categories.set(photo.category, personal ? photo.categoryLabel : photo.category === 'forest' ? '森林' : '海岸'));
-  const fragment = document.createDocumentFragment();
-  categories.forEach((label, value) => {
-    const button = element('button', '', label);
-    button.type = 'button';
-    button.dataset.filter = value;
-    button.setAttribute('aria-pressed', String(value === 'all'));
-    button.addEventListener('click', () => {
-      activeFilter = value;
-      filterGroup.querySelectorAll('button').forEach(filter => filter.setAttribute('aria-pressed', String(filter === button)));
-      renderPhotos(true);
-    });
-    fragment.append(button);
-  });
-  activeFilter = 'all';
-  filterGroup.replaceChildren(fragment);
-}
-async function hydratePhotos() {
-  let personal = false;
-  try {
-    const data = await readIndex('content/photos/index.json');
-    if (!data.length) {
-      photos = samplePhotos;
-      document.querySelector('#photo-note').textContent = '以下为 Unsplash 示例影像，非个人摄影作品。';
-    } else {
-      personal = true;
-      photos = data.flatMap(item => {
-        if (!item || typeof item.alt !== 'string' || typeof item.caption !== 'string') return [];
-        const src = localContentPath('content/photos/', item.file, /\.(?:jpe?g|png|webp|avif|gif|svg)$/i);
-        const categoryLabel = typeof item.category === 'string' && item.category.trim() ? item.category.trim() : '未分类';
-        return src ? [{ src, alt: item.alt, caption: item.caption, category: `personal:${categoryLabel}`, categoryLabel, width: 1600, height: 1100 }] : [];
-      });
-      document.querySelector('#photo-note').textContent = '个人影像集';
-      if (photos.length < data.length) photoLoadWarning = '部分影像条目信息不完整，暂时无法显示。';
+  lightbox.addEventListener('keydown', event => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      stepLightbox(event.key === 'ArrowLeft' ? -1 : 1);
     }
-  } catch {
-    photos = samplePhotos;
-    photoLoadWarning = '个人影像暂未能加载，以下展示示例影像。';
-    document.querySelector('#photo-note').textContent = 'Unsplash 示例影像，非个人摄影作品。';
+  });
+
+  function renderPhotos(announce = false) {
+    visiblePhotos = photos.filter(photo => activeFilter === 'all' || photo.category === activeFilter);
+    const fragment = document.createDocumentFragment();
+    visiblePhotos.forEach((photo, index) => {
+      const figure = element('figure', 'reveal');
+      const button = element('button', 'photo-media');
+      button.type = 'button';
+      button.setAttribute('aria-label', `放大查看：${photo.caption || photo.alt || '影像'}`);
+      button.setAttribute('aria-haspopup', 'dialog');
+      const image = element('img');
+      image.src = photo.src;
+      image.alt = photo.alt;
+      image.loading = 'lazy';
+      image.decoding = 'async';
+      image.width = photo.width;
+      image.height = photo.height;
+      image.addEventListener('error', () => {
+        photoStatus.textContent = '部分影像暂时无法加载，请稍后刷新页面。';
+        button.disabled = true;
+      }, { once: true });
+      const open = element('span', 'photo-open', '↗');
+      open.setAttribute('aria-hidden', 'true');
+      button.append(image, open);
+      button.addEventListener('click', () => openLightbox(index, button));
+      const caption = element('figcaption');
+      const name = element('span', 'photo-name');
+      name.append(element('span', 'photo-number', String(index + 1).padStart(2, '0')), document.createTextNode(photo.caption || photo.alt || '影像'));
+      caption.append(name);
+      if (photo.credit) caption.append(element('span', 'photo-credit', photo.credit));
+      figure.append(button, caption);
+      fragment.append(figure);
+    });
+    photoGrid.replaceChildren(fragment);
+    photoStatus.textContent = photoLoadWarning || (announce ? `显示 ${visiblePhotos.length} 张影像` : '');
+    revealElements(photoGrid);
   }
-  configurePhotoFilters(personal);
-  renderPhotos();
+  function configurePhotoFilters(personal = false) {
+    const filterGroup = document.querySelector('.photo-filters');
+    const categories = new Map([['all', '全部']]);
+    photos.forEach(photo => categories.set(photo.category, personal ? photo.categoryLabel : photo.category === 'forest' ? '森林' : '海岸'));
+    const fragment = document.createDocumentFragment();
+    categories.forEach((label, value) => {
+      const button = element('button', '', label);
+      button.type = 'button';
+      button.dataset.filter = value;
+      button.setAttribute('aria-pressed', String(value === 'all'));
+      button.addEventListener('click', () => {
+        activeFilter = value;
+        filterGroup.querySelectorAll('button').forEach(filter => filter.setAttribute('aria-pressed', String(filter === button)));
+        renderPhotos(true);
+      });
+      fragment.append(button);
+    });
+    activeFilter = 'all';
+    filterGroup.replaceChildren(fragment);
+  }
+  async function hydratePhotos() {
+    let personal = false;
+    try {
+      const data = await readIndex('content/photos/index.json');
+      if (!data.length) {
+        photos = samplePhotos;
+        document.querySelector('#photo-note').textContent = '以下为 Unsplash 示例影像，非个人摄影作品。';
+      } else {
+        personal = true;
+        photos = data.flatMap(item => {
+          if (!item || typeof item.alt !== 'string' || typeof item.caption !== 'string') return [];
+          const src = localContentPath('content/photos/', item.file, /\.(?:jpe?g|png|webp|avif|gif|svg)$/i);
+          const categoryLabel = typeof item.category === 'string' && item.category.trim() ? item.category.trim() : '未分类';
+          return src ? [{ src, alt: item.alt, caption: item.caption, category: `personal:${categoryLabel}`, categoryLabel, width: 1600, height: 1100 }] : [];
+        });
+        document.querySelector('#photo-note').textContent = '个人影像集';
+        if (photos.length < data.length) photoLoadWarning = '部分影像条目信息不完整，暂时无法显示。';
+      }
+    } catch {
+      photos = samplePhotos;
+      photoLoadWarning = '个人影像暂未能加载，以下展示示例影像。';
+      document.querySelector('#photo-note').textContent = 'Unsplash 示例影像，非个人摄影作品。';
+    }
+    configurePhotoFilters(personal);
+    renderPhotos();
+  }
+  hydratePhotos();
 }
-hydrateWriting();
-hydratePhotos();
+if (document.querySelector('#writing-list')) hydrateWriting();
+if (document.querySelector('#photo-grid')) initPhotoGallery();
