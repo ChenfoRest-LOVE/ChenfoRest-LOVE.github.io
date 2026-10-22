@@ -22,7 +22,7 @@
 .essay-body p { margin: 0 0 1.6em; text-indent: 2em; }
 .essay-body p:last-child { margin-bottom: 0; }
 .essay-body .essay-lead { text-indent: 0; color: var(--muted); font-size: .94em; }
-.essay-body .essay-section-title { margin: 2.6em 0 1.3em; font: 400 18px/1.5 var(--reading-serif); letter-spacing: .18em; color: var(--muted); }
+.essay-body .essay-section-title { margin: 1.9em 0 .9em; font: 400 clamp(24px,2.2vw,28px)/1.4 var(--reading-serif); letter-spacing: .12em; color: var(--ink); }
 .essay-body .essay-figure { margin: 2em 0 2.5em; }
 .essay-body .essay-figure img { display: block; width: auto; max-width: 100%; height: auto; margin-inline: auto; border-radius: 4px; }
 .essay-citation { font: 400 .65em/0 var(--sans); vertical-align: super; white-space: nowrap; letter-spacing: 0; margin-inline: .08em; scroll-margin-top: 32px; }
