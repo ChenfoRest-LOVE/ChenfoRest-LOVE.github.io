@@ -21,6 +21,10 @@
 .essay-body { font: 400 18px/2.15 var(--reading-serif); letter-spacing: .045em; overflow-wrap: break-word; line-break: strict; }
 .essay-body p { margin: 0 0 1.6em; text-indent: 2em; }
 .essay-body p:last-child { margin-bottom: 0; }
+.essay-body .essay-lead { text-indent: 0; color: var(--muted); font-size: .94em; }
+.essay-body .essay-section-title { margin: 2.6em 0 1.3em; font: 400 18px/1.5 var(--reading-serif); letter-spacing: .18em; color: var(--muted); }
+.essay-body .essay-figure { margin: 2em 0 2.5em; }
+.essay-body .essay-figure img { display: block; width: auto; max-width: 100%; height: auto; margin-inline: auto; border-radius: 4px; }
 .essay-end { display: block; width: 24px; height: 1px; background: var(--muted); margin: 60px auto; opacity: .65; }
 .essay-navigation { position: static; max-width: 680px; margin: 0 auto; border-top: 1px solid var(--line); padding: 28px 0 0; display: flex; flex-direction: row; justify-content: space-between; gap: 24px; font-size: 12px; background: none; }
 .essay-navigation a { display: inline-flex; align-items: center; gap: 14px; padding: 0; font-size: inherit; color: var(--muted); transition: color .25s; }
