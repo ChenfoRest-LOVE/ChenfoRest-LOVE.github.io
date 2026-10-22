@@ -25,6 +25,20 @@
 .essay-body .essay-section-title { margin: 2.6em 0 1.3em; font: 400 18px/1.5 var(--reading-serif); letter-spacing: .18em; color: var(--muted); }
 .essay-body .essay-figure { margin: 2em 0 2.5em; }
 .essay-body .essay-figure img { display: block; width: auto; max-width: 100%; height: auto; margin-inline: auto; border-radius: 4px; }
+.essay-citation { font: 400 .65em/0 var(--sans); vertical-align: super; white-space: nowrap; letter-spacing: 0; margin-inline: .08em; scroll-margin-top: 32px; }
+.essay-citation a { color: var(--accent); text-decoration: none; }
+.essay-citation a:hover, .essay-citation:target a { text-decoration: underline; text-underline-offset: .18em; }
+.essay-citation a:focus-visible, .reference-back:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
+.essay-references { margin-top: 52px; border-top: 1px solid var(--line); padding-top: 26px; font: 13px/1.85 var(--sans); color: var(--muted); }
+.essay-references h2 { margin-bottom: 23px; color: var(--ink); font: 400 17px/1.5 var(--reading-serif); letter-spacing: .1em; }
+.reference-list { padding: 0; list-style: none; }
+.reference-list li { position: relative; display: grid; grid-template-columns: 27px minmax(0,1fr); gap: 8px; padding-right: 22px; margin-top: 16px; scroll-margin-top: 32px; }
+.reference-list li:first-child { margin-top: 0; }
+.reference-list p { margin: 0; overflow-wrap: anywhere; }
+.reference-number { font-variant-numeric: tabular-nums; }
+.reference-list li:target { outline: 1px solid var(--line); outline-offset: 8px; }
+.reference-back { position: absolute; top: 0; right: 0; color: var(--accent); white-space: nowrap; text-decoration: none; padding-inline: 3px; }
+.reference-back:hover { text-decoration: underline; }
 .essay-end { display: block; width: 24px; height: 1px; background: var(--muted); margin: 60px auto; opacity: .65; }
 .essay-navigation { position: static; max-width: 680px; margin: 0 auto; border-top: 1px solid var(--line); padding: 28px 0 0; display: flex; flex-direction: row; justify-content: space-between; gap: 24px; font-size: 12px; background: none; }
 .essay-navigation a { display: inline-flex; align-items: center; gap: 14px; padding: 0; font-size: inherit; color: var(--muted); transition: color .25s; }
@@ -57,4 +71,7 @@
   .essay-main { padding: 0; }
   .essay-body { font-size: 11pt; }
   .essay-heading { animation: none; break-after: avoid; }
+  .essay-references { color: inherit; font-size: 9pt; }
+  .essay-references h2, .essay-citation a { color: inherit; }
+  .reference-back { display: none; }
 }
