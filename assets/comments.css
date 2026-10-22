@@ -1,0 +1,49 @@
+.comments { max-width: 680px; margin: 0 auto 48px; padding-top: 30px; border-top: 1px solid var(--line); font: 14px/1.75 var(--sans); }
+.comments [hidden] { display: none !important; }
+.comments-heading, .comments-account, .comment-meta, .comment-compose-footer { display: flex; align-items: center; gap: 14px; }
+.comments-heading { justify-content: space-between; margin-bottom: 20px; }
+.comments h2 { font: 400 19px/1.5 var(--reading-serif, var(--serif)); letter-spacing: .12em; }
+.comments p { margin: 0; }
+.comments button, .reader-dialog button { font: inherit; cursor: pointer; transition: color .18s, border-color .18s; }
+.comments button:disabled, .reader-dialog button:disabled { cursor: default; opacity: .5; }
+.comments button:focus-visible, .reader-dialog button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.comments .comment-link, .reader-dialog .comment-link { padding: 4px 0; border: 0; background: none; color: var(--muted); font-size: 12px; }
+.comments .comment-link:hover, .reader-dialog .comment-link:hover { color: var(--ink); }
+.comments-account { min-width: 0; font-size: 12px; color: var(--muted); flex-wrap: wrap; justify-content: flex-end; }
+.comments-account span { overflow-wrap: anywhere; }
+.comments-note, .comments-empty, .comments-status { color: var(--muted); font-size: 12px; }
+.comments-status { min-height: 1.75em; margin-top: 12px !important; }
+.comments-status[data-error="true"], .reader-status { color: var(--ink); }
+.comment-compose { margin-top: 22px; }
+.comment-compose label { display: block; font-size: 12px; margin-bottom: 9px; color: var(--muted); }
+.comment-compose textarea, .reader-dialog input { width: 100%; box-sizing: border-box; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 0; font: inherit; padding: 12px 14px; }
+.comment-compose textarea { resize: vertical; min-height: 110px; max-height: 320px; font-size: 14px; line-height: 1.8; }
+.comment-compose textarea:focus, .reader-dialog input:focus { outline: 1px solid var(--accent); outline-offset: 1px; }
+.comment-compose textarea[aria-invalid="true"] { border-color: var(--ink); }
+.comment-compose-footer { margin-top: 10px; justify-content: space-between; }
+.comment-compose-footer output { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.comments .comment-submit, .reader-dialog .comment-submit { background: transparent; border: 1px solid var(--line); color: var(--ink); padding: 8px 17px; font-size: 12px; }
+.comments .comment-submit:hover:enabled, .reader-dialog .comment-submit:hover:enabled { border-color: var(--accent); color: var(--accent); }
+.comment-list { margin-top: 26px; }
+.comment-entry { border-top: 1px solid var(--line); padding: 21px 0; }
+.comment-meta { flex-wrap: wrap; row-gap: 4px; margin-bottom: 9px; }
+.comment-meta h3 { font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.comment-meta time { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+.comment-meta .comment-link { margin-left: auto; font-size: 10px; }
+.comment-entry p { font-size: 14px; line-height: 1.9; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments .comments-more { display: block; margin: 0 auto; }
+.reader-dialog { width: min(380px, calc(100% - 40px)); box-sizing: border-box; max-height: calc(100dvh - 40px); padding: 28px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: 13px/1.65 var(--sans); }
+.reader-dialog::backdrop { background: rgb(0 0 0 / .7); }
+.reader-dialog-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.reader-dialog h2 { font: 400 22px/1.5 var(--reading-serif, var(--serif)); letter-spacing: .08em; }
+.reader-dialog form { display: grid; gap: 15px; }
+.reader-dialog label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; }
+.reader-dialog input { font-size: 15px; min-width: 0; }
+.reader-dialog small { color: var(--muted); font-size: 11px; }
+.reader-dialog [hidden] { display: none !important; }
+.reader-status { font-size: 12px; min-height: 1.65em; margin: 0; }
+.reader-dialog-actions { display: flex; justify-content: space-between; gap: 18px; align-items: center; }
+@media (min-width: 1600px) { .comments { max-width: 720px; } }
+@media (max-width: 600px) { .comments { padding-top: 25px; margin-bottom: 32px; } .reader-dialog { padding: 23px; } .comments-heading { align-items: baseline; gap: 16px; } }
+@media print { .comments, .reader-dialog { display: none !important; } }
+@media (prefers-reduced-motion: reduce) { .comments button, .reader-dialog button { transition: none; } }
