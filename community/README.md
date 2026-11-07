@@ -1,4 +1,4 @@
-# 文章评论（本地可用，公网待上线）
+# 文章评论（本地预览与腾讯云 HTTPS）
 
 文章正文下方均有评论区，沿用现有深浅主题。访客可阅读，独立账号注册/登录后可发布 1–100 字的纯文本评论；支持退出、删除自己的评论，以及每页 20 条的“更早的评论”。账号不具备封面管理员权限，两套数据库完全独立。
 
@@ -32,14 +32,14 @@ Windows 数据在 `%LOCALAPPDATA%/ForestComments/community.sqlite`；Linux 默�
 
 新增文章时在 `articles.json` 添加 ID 与 HTML 路径，并复用现有文章的评论 section、两个脚本和样式引用，`data-comments-article` 使用同一个 ID。
 
-## GitHub 与后续部署
+## GitHub 与腾讯云部署
 
-本次只维护代码和本地预览，未向腾讯云同步，也未恢复 DNS。GitHub Pages 的 `assets/comments-config.js` 默认 `enabled: false`，文章下显示“评论暂未开放”，不请求 API；本地预览只在响应中启用配置，不改仓库开关。
+GitHub Pages 的 `assets/comments-config.js` 默认 `enabled: false`，文章下显示“评论暂未开放”，不请求 API；本地预览只在响应中启用配置。腾讯云的 `denss.asia` 由 Nginx 将该文件和 `/api/community/` 代理到独立的评论服务，因此同源 HTTPS 页面会启用评论。
 
-备案与 HTTPS 恢复后，建议将后端与网站放在**同一 HTTPS 域名**，不使用跨站 Cookie，不借用封面管理员账号。后续需独立完成：
+2026-11-07 已在腾讯云部署代码、服务和 HTTPS 代理；公网域名访问还取决于 DNSPod 是否恢复 `@`、`www` 两条 A 记录。评论后台不借用封面管理员账号，数据库独立。部署入口为 `sudo sh community/install.sh`，要求上传目录同时包含 `community/` 与 `deploy/nginx.conf`。安装程序先验证代码和配置，再启动服务、检查本机接口、验证 Nginx、重载并检查 HTTPS 接口；失败会恢复旧 Nginx 配置。生产结构：
 
-1. 专用非特权用户、受保护的数据目录、systemd 服务，使用 `--origin https://denss.asia --trust-proxy --port 6192`，仍只监听 `127.0.0.1`。
-2. 在现有 HTTPS server 块添加下列代理片段，保留现有 `/admin/` 与 `/api/covers`，先检查 Nginx 配置再重载：
+1. 专用非特权用户 `forest-comments`、受保护的 `/var/lib/forest-comments/community.sqlite`（目录 700、数据库 600）、开机启动的 `forest-comments.service`；仅监听 `127.0.0.1:6192`。
+2. 现有 HTTPS server 块中的代理保留 `/admin/` 与 `/api/covers`，新增：
 
 ```nginx
 location ^~ /api/community/ {
@@ -61,11 +61,11 @@ location = /assets/comments-config.js {
 }
 ```
 
-3. 上述精确路径代理会为同源网站启用评论，仓库中的开关继续保持关闭。验收真实注册、登录、发布、删除、限速和备份。`--trust-proxy` 仅用于可信本机反代，缺少合法 X-Real-IP 时写入拒绝；不要把后端端口暴露到公网。
+3. `--trust-proxy` 仅用于可信本机反代，缺少合法 X-Real-IP 时写入拒绝；后端端口不对公网开放。生产数据库不放在 GitHub 仓库或静态目录中。安装前已有数据时，脚本会停止服务并在 `/var/backups/chenforest/comments-<时间>/` 留下 root 专有数据库快照。恢复前先停止服务。
 
 GitHub Pages 与 `denss.asia` 属于不同站点，本版不启用跨站登录；GitHub Pages 继续作为静态预览。将来若要两处均支持在线评论，需另行设计身份接入与安全的跨站流程。
 
-## 验证（不访问公网，不发送通知）
+## 验证（不发送通知）
 
 ```powershell
 python -m unittest discover -s community -p "test_*.py" -v
@@ -73,3 +73,5 @@ node community/test_browser.cjs
 ```
 
 浏览器测试使用现有 Playwright 与 Chrome、独立临时数据库和隔离浏览器，不触碰真实账号或评论；仅访问本机 4194。可通过 `PLAYWRIGHT_MODULE`、`TEST_PYTHON` 指定已有运行时，通过 `COMMENTS_SCREENSHOT` 指定截图路径。测试账号密码是固定测试夹具，不是任何真实凭据。
+
+2026-11-07 本机 13 项数据与 HTTP 测试、服务器上 8 项数据测试通过；生产 HTTPS 直连的健康接口和启用开关返回 200，来源无效的注册请求返回 422。正式访客账户尚未创建，真实用户注册和评论需在域名解析恢复后由用户操作验证。

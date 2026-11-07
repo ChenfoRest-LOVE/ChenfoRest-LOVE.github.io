@@ -45,9 +45,17 @@ for file in server.py store.py articles.json; do
 done
 install -o root -g root -m 644 "$src/forest-comments.service" /etc/systemd/system/forest-comments.service
 systemctl daemon-reload
-systemctl enable --now forest-comments.service
+systemctl enable forest-comments.service
 systemctl restart forest-comments.service
-if ! curl --fail --silent --show-error --max-time 5 -H 'Host: denss.asia' http://127.0.0.1:6192/api/community/health >/dev/null; then
+ready=no
+for attempt in 1 2 3 4 5; do
+    if curl --fail --silent --max-time 2 -H 'Host: denss.asia' http://127.0.0.1:6192/api/community/health >/dev/null; then
+        ready=yes
+        break
+    fi
+    sleep 1
+done
+if [ "$ready" != yes ]; then
     echo 'Reader API failed to start; Nginx was not changed.' >&2
     exit 1
 fi
@@ -58,7 +66,15 @@ if ! nginx -t; then
     exit 1
 fi
 systemctl reload nginx
-if ! curl --fail --silent --show-error --max-time 5 --resolve denss.asia:443:127.0.0.1 https://denss.asia/api/community/health >/dev/null; then
+ready=no
+for attempt in 1 2 3 4 5; do
+    if curl --fail --silent --max-time 2 --resolve denss.asia:443:127.0.0.1 https://denss.asia/api/community/health >/dev/null; then
+        ready=yes
+        break
+    fi
+    sleep 1
+done
+if [ "$ready" != yes ]; then
     cp -p "$backup/nginx.conf" /etc/nginx/sites-available/chenforest
     nginx -t && systemctl reload nginx
     echo 'HTTPS reader health check failed; Nginx configuration restored.' >&2

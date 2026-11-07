@@ -1,6 +1,6 @@
 # 腾讯云静态部署
 
-当前工作约定：备案期间只修改本地项目并提交 GitHub；腾讯云留待用户后续明确要求再同步。以下脚本保留供届时手动使用，本机封面管理不再调用它。
+2026-11-07 用户已要求同步腾讯云；网站从 GitHub `main` 手动发布到上海服务器。本机封面管理仍不自动调用发布脚本。
 
 GitHub `main` 为唯一代码来源。发布脚本在本机获取 `origin/main`，用 `git archive` 只打包五个 HTML、`assets/` 和 `content/`，通过既有 SSH 别名上传。未提交改动、Git 凭据、文档与部署脚本不会进入网站根目录。服务器无需保存 GitHub 写入凭据。
 
@@ -40,7 +40,7 @@ GitHub `main` 为唯一代码来源。发布脚本在本机获取 `origin/main`�
 
 域名为 `denss.asia` 和 `www.denss.asia`，A 记录指向腾讯云服务器。Let’s Encrypt 证书覆盖两个域名；证书和私钥只保存在服务器 `/etc/letsencrypt/`，不进入仓库或网站目录。
 
-**当前访问状态（2026-10-16 10:39）：腾讯云已拦截未备案域名。** HTTP 返回 302 至腾讯云备案提示页，HTTPS 握手被中途关闭。服务器内部 HTTPS、静态文章与 IP 测试访问正常；已发布的 GitHub Pages 可用。完成备案后再复查公网域名，早前技术验收通过不代表当前仍可从公网访问。
+**当前访问状态（2026-11-07）：** 用户提供备案号「闽ICP备2025125800号」，已添加到所有公开页面页脚。服务器 HTTPS 直连（指定 `denss.asia` 主机名）证书验证和页面返回正常，GitHub `main` 静态版本已发布；但 DNSPod 当前没有 `@` 与 `www` 的 A 记录，普通域名访问仍等待解析恢复。2026-10-16 未备案拦截为历史状态。
 
 `nginx.conf` 已启用：域名 HTTP 跳转到 `https://denss.asia`，保留路径与查询参数，IP HTTP 与本机发布检查继续可用。云防火墙已允许来源 `0.0.0.0/0` 的 TCP 443，两个域名的公网 HTTPS、五个页面与主要资源已于 2026-10-16 验收通过。新增或迁移实例时，必须先开放端口并验证公网 HTTPS，再启用 HTTP 跳转；放通方法见[腾讯云防火墙说明](https://cloud.tencent.cn/document/product/1207/136745)。
 
@@ -54,6 +54,6 @@ ssh xmu-server 'sudo certbot renew --dry-run'
 
 自动续期模拟已成功。保持 80 端口和 ACME 路径可访问，才能继续使用此验证方式。日常网页发布只替换静态文件，不会修改 Nginx 或证书。
 
-域名注册、DNS 与 HTTPS 不代表已完成 ICP 备案。上海服务器正式通过域名提供网站前，需要完成适用的备案与接入手续；当前尚未确认备案状态。参见[腾讯云说明](https://cloud.tencent.com/document/product/243/19630/)。
+用户已确认备案完成并提供备案号。恢复 `@` 与 `www` 的 A 记录至 `110.40.159.167` 后，仍需从正常公网 DNS 路径复核页面、后台登录与证书。参见[腾讯云解析说明](https://cloud.tencent.com/document/product/302/3446)。
 
 首次安装由管理员安装 Ubuntu 仓库的 Nginx，将 `activate.py` 安装到上述程序路径，把 `nginx.conf` 放入 Nginx 的 `sites-available` 并启用。配置变更后必须先运行 `sudo nginx -t` 再 reload；日常发布仅切换静态文件版本，无需重启 Nginx。
