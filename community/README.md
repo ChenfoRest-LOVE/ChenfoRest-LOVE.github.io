@@ -36,7 +36,7 @@ Windows 数据在 `%LOCALAPPDATA%/ForestComments/community.sqlite`；Linux 默�
 
 GitHub Pages 的 `assets/comments-config.js` 默认 `enabled: false`，文章下显示“评论暂未开放”，不请求 API；本地预览只在响应中启用配置。腾讯云的 `denss.asia` 由 Nginx 将该文件和 `/api/community/` 代理到独立的评论服务，因此同源 HTTPS 页面会启用评论。
 
-2026-11-07 已在腾讯云部署代码、服务和 HTTPS 代理；公网域名访问还取决于 DNSPod 是否恢复 `@`、`www` 两条 A 记录。评论后台不借用封面管理员账号，数据库独立。部署入口为 `sudo sh community/install.sh`，要求上传目录同时包含 `community/` 与 `deploy/nginx.conf`。安装程序先验证代码和配置，再启动服务、检查本机接口、验证 Nginx、重载并检查 HTTPS 接口；失败会恢复旧 Nginx 配置。生产结构：
+2026-11-07 已在腾讯云部署代码、服务和 HTTPS 代理；DNSPod 的 `@`、`www` 两条 A 记录已恢复并通过正常域名路径检查。评论后台不借用封面管理员账号，数据库独立。部署入口为 `sudo sh community/install.sh`，要求上传目录同时包含 `community/` 与 `deploy/nginx.conf`。安装程序先验证代码和配置，再启动服务、检查本机接口、验证 Nginx、重载并检查 HTTPS 接口；失败会恢复旧 Nginx 配置。生产结构：
 
 1. 专用非特权用户 `forest-comments`、受保护的 `/var/lib/forest-comments/community.sqlite`（目录 700、数据库 600）、开机启动的 `forest-comments.service`；仅监听 `127.0.0.1:6192`。
 2. 现有 HTTPS server 块中的代理保留 `/admin/` 与 `/api/covers`，新增：
@@ -74,4 +74,4 @@ node community/test_browser.cjs
 
 浏览器测试使用现有 Playwright 与 Chrome、独立临时数据库和隔离浏览器，不触碰真实账号或评论；仅访问本机 4194。可通过 `PLAYWRIGHT_MODULE`、`TEST_PYTHON` 指定已有运行时，通过 `COMMENTS_SCREENSHOT` 指定截图路径。测试账号密码是固定测试夹具，不是任何真实凭据。
 
-2026-11-07 本机 13 项数据与 HTTP 测试、服务器上 8 项数据测试通过；生产 HTTPS 直连的健康接口和启用开关返回 200，来源无效的注册请求返回 422。正式访客账户尚未创建，真实用户注册和评论需在域名解析恢复后由用户操作验证。
+2026-11-07 本机 13 项数据与 HTTP 测试、服务器上 8 项数据测试通过；生产 HTTPS 的健康接口和启用开关经正常域名路径返回 200，来源无效的注册请求返回 422。公开文章的评论区与注册窗口已在浏览器中显示。正式访客账户尚未创建，真实用户注册和评论需由用户自行操作验证。

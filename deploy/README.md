@@ -40,7 +40,7 @@ GitHub `main` 为唯一代码来源。发布脚本在本机获取 `origin/main`�
 
 域名为 `denss.asia` 和 `www.denss.asia`，A 记录指向腾讯云服务器。Let’s Encrypt 证书覆盖两个域名；证书和私钥只保存在服务器 `/etc/letsencrypt/`，不进入仓库或网站目录。
 
-**当前访问状态（2026-11-07）：** 用户提供备案号「闽ICP备2025125800号」，已添加到所有公开页面页脚。服务器 HTTPS 直连（指定 `denss.asia` 主机名）证书验证和页面返回正常，GitHub `main` 静态版本已发布；但 DNSPod 当前没有 `@` 与 `www` 的 A 记录，普通域名访问仍等待解析恢复。2026-10-16 未备案拦截为历史状态。
+**当前访问状态（2026-11-07）：** 用户提供备案号「闽ICP备2025125800号」，已添加到所有公开页面页脚。DNSPod 的 `@` 与 `www` A 记录均已恢复至 `110.40.159.167`，两个域名解析、HTTPS 证书验证、五个主页面、文章、影像资源、评论 API、封面 API 和管理入口经正常域名路径检查通过。2026-10-16 未备案拦截为历史状态。
 
 `nginx.conf` 已启用：域名 HTTP 跳转到 `https://denss.asia`，保留路径与查询参数，IP HTTP 与本机发布检查继续可用。云防火墙已允许来源 `0.0.0.0/0` 的 TCP 443，两个域名的公网 HTTPS、五个页面与主要资源已于 2026-10-16 验收通过。新增或迁移实例时，必须先开放端口并验证公网 HTTPS，再启用 HTTP 跳转；放通方法见[腾讯云防火墙说明](https://cloud.tencent.cn/document/product/1207/136745)。
 
@@ -54,6 +54,6 @@ ssh xmu-server 'sudo certbot renew --dry-run'
 
 自动续期模拟已成功。保持 80 端口和 ACME 路径可访问，才能继续使用此验证方式。日常网页发布只替换静态文件，不会修改 Nginx 或证书。
 
-用户已确认备案完成并提供备案号。恢复 `@` 与 `www` 的 A 记录至 `110.40.159.167` 后，仍需从正常公网 DNS 路径复核页面、后台登录与证书。参见[腾讯云解析说明](https://cloud.tencent.com/document/product/302/3446)。
+用户已确认备案完成并提供备案号；正常公网 DNS 路径已复核页面与证书。后台登录入口和评论注册入口已显示，真实用户的凭据输入、发表评论仍由用户自行完成。参见[腾讯云解析说明](https://cloud.tencent.com/document/product/302/3446)。
 
 首次安装由管理员安装 Ubuntu 仓库的 Nginx，将 `activate.py` 安装到上述程序路径，把 `nginx.conf` 放入 Nginx 的 `sites-available` 并启用。配置变更后必须先运行 `sudo nginx -t` 再 reload；日常发布仅切换静态文件版本，无需重启 Nginx。

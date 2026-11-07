@@ -1,6 +1,6 @@
 # 陈炳奇 · Forest 个人网站
 
-深色沉浸式个人网站，围绕影像、哲学阅读与随笔展开。HTML、CSS 和原生 JavaScript，无需安装依赖或构建。首页仅展示个人介绍与教育经历，各模块通过独立页面访问，支持 GitHub Pages。
+深色沉浸式个人网站，围绕影像、哲学阅读与随笔展开。HTML、CSS 和原生 JavaScript，无需安装依赖或构建。首页仅展示个人介绍与教育经历，各模块通过独立页面访问，支持 GitHub Pages 与腾讯云 HTTPS。首页横屏和手机竖屏的森林氛围影像由 ImageGen 生成，个人图册仍使用作者提供的真实照片。
 
 ## 本地预览
 
@@ -18,7 +18,7 @@ python -m http.server 4173 --bind 127.0.0.1
 
 文章末尾均有评论区。运行 `./community/start.ps1`，打开 `http://127.0.0.1:4192/writing.html`，可在文章下注册独立访客账号、登录并发表不超过 100 字的评论。账号与评论数据保存在仓库外，刷新和重启后保留；支持删除自己的评论。
 
-当前按备案期间的约定先在本地验收，GitHub Pages 显示“评论暂未开放”。普通静态预览与封面管理入口也不会启动评论后端。使用方式、数据位置与未来上线步骤见 [评论说明](community/README.md)，本次不部署腾讯云。
+GitHub Pages 显示“评论暂未开放”；`denss.asia` 已通过同源 HTTPS 接入独立评论后台，访客可注册、登录和评论。普通静态预览与封面管理入口不会启动评论后端。使用方式、数据位置与部署说明见 [评论说明](community/README.md)。
 
 ## 页面结构
 
@@ -101,4 +101,4 @@ GitHub 仓库中依次打开 **Settings → Pages**，在 **Build and deployment
 
 国内服务器使用 Nginx 提供相同的静态页面，GitHub `main` 继续作为代码来源。将修改推送到 `main` 后，在已配置专用 SSH 连接的本机运行 `./deploy/publish.ps1` 即可同步；`./deploy/publish.ps1 -Rollback` 可切回上一版。
 
-部署只上传网页、图片和内容索引，每个版本按 Git SHA 独立保存，切换不需要重启服务。国内域名为 `denss.asia`，支持 `www.denss.asia`，已配置 HTTP 跳转 HTTPS 和证书自动续期。2026-10-16 观察到腾讯云未备案拦截，当前国内域名不能正常访问，需完成备案后复查；文章和网页代码已部署在服务器上。现可访问 [GitHub Pages](https://chenforest-love.github.io/)。配置、续期与验收说明见 [deploy/README.md](deploy/README.md)。
+部署只上传网页、图片和内容索引，每个版本按 Git SHA 独立保存，切换不需要重启服务。国内域名为 [denss.asia](https://denss.asia/)，支持 `www.denss.asia`，已配置 HTTP 跳转 HTTPS、证书自动续期、封面后台和文章评论。2026-11-07 域名解析恢复后，五个主页面、主要资源和评论接口已通过正常公网域名路径检查。备案号「闽ICP备2025125800号」显示于公开页面页脚。另可访问 [GitHub Pages](https://chenforest-love.github.io/) 作为静态预览。配置、续期与验收说明见 [deploy/README.md](deploy/README.md)。
