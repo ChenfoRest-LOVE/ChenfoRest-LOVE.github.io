@@ -1,0 +1,32 @@
+[Unit]
+Description=Forest reader accounts and article comments
+After=network.target
+
+[Service]
+Type=simple
+User=forest-comments
+Group=forest-comments
+WorkingDirectory=/opt/forest-comments
+ExecStart=/usr/bin/python3 -B /opt/forest-comments/server.py --port 6192 --data /var/lib/forest-comments/community.sqlite --root /var/www/chenforest/current --origin https://denss.asia --trust-proxy
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/forest-comments
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=600M
+TasksMax=48
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
