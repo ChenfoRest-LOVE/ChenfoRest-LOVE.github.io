@@ -1,4 +1,11 @@
 .comments { max-width: 680px; margin: 0 auto 48px; padding-top: 30px; border-top: 1px solid var(--line); font: 14px/1.75 var(--sans); }
+.article-likes { display: flex; align-items: center; gap: 14px; min-height: 52px; margin: 0 0 36px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.comments .article-like-button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid var(--line); background: transparent; color: var(--ink); letter-spacing: .06em; }
+.comments .article-like-button:hover:enabled, .comments .article-like-button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.comments .article-like-button[aria-pressed="true"] { opacity: 1; }
+.article-like-button [aria-hidden] { font-size: 18px; line-height: 1; }
+.article-like-count { margin-left: 2px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.article-like-status { font-size: 12px; color: var(--muted); }
 .comments [hidden] { display: none !important; }
 .comments-heading, .comments-account, .comment-meta, .comment-compose-footer { display: flex; align-items: center; gap: 14px; }
 .comments-heading { justify-content: space-between; margin-bottom: 20px; }

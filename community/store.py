@@ -55,6 +55,9 @@ class Store:
                     id INTEGER PRIMARY KEY AUTOINCREMENT, article TEXT NOT NULL,
                     user_id INTEGER NOT NULL REFERENCES users(id), text TEXT NOT NULL, created REAL NOT NULL);
                 CREATE INDEX IF NOT EXISTS comments_article ON comments(article,id);
+                CREATE TABLE IF NOT EXISTS likes (
+                    article TEXT NOT NULL, user_id INTEGER NOT NULL REFERENCES users(id),
+                    PRIMARY KEY(article,user_id));
                 CREATE TABLE IF NOT EXISTS events (action TEXT NOT NULL, subject TEXT NOT NULL, created REAL NOT NULL);
                 CREATE INDEX IF NOT EXISTS events_lookup ON events(action,subject,created);
             ''')
@@ -152,6 +155,23 @@ class Store:
     def _article(self, article):
         if not isinstance(article, str) or article not in self.articles:
             raise Problem(404, '文章不存在。')
+
+    def likes(self, article, user=None):
+        self._article(article)
+        with self.db() as db:
+            count = db.execute('SELECT COUNT(*) FROM likes WHERE article=?', (article,)).fetchone()[0]
+            liked = bool(user and db.execute('SELECT 1 FROM likes WHERE article=? AND user_id=?',
+                                             (article, user['id'])).fetchone())
+        return {'count': count, 'liked': liked}
+
+    def like(self, article, user):
+        if not user:
+            raise Problem(401, '请先登录。')
+        self._article(article)
+        with self.db() as db:
+            db.execute('INSERT OR IGNORE INTO likes(article,user_id) VALUES (?,?)', (article, user['id']))
+            count = db.execute('SELECT COUNT(*) FROM likes WHERE article=?', (article,)).fetchone()[0]
+        return {'count': count, 'liked': True}
 
     def post(self, article, text, user, ip):
         if not user:

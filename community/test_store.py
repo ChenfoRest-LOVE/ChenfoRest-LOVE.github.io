@@ -118,6 +118,22 @@ class StoreTests(unittest.TestCase):
         item = self.store.post('chire', '\u0085' + '字' * 100 + '\u0085', user, 'one')
         self.assertEqual(100, len(item['text']))
 
+    def test_one_persistent_like_per_reader_per_article(self):
+        _, first = self.reader()
+        _, second = self.reader('another', 'two')
+        self.assertEqual({'count': 0, 'liked': False}, self.store.likes('chire'))
+        self.rejects(401, lambda: self.store.like('chire', None))
+        self.assertEqual({'count': 1, 'liked': True}, self.store.like('chire', first))
+        self.assertEqual({'count': 1, 'liked': True}, self.store.like('chire', first))
+        self.assertEqual({'count': 1, 'liked': False}, self.store.likes('chire', second))
+        self.assertEqual({'count': 2, 'liked': True}, self.store.like('chire', second))
+        self.assertEqual({'count': 1, 'liked': True}, self.store.like('yuemeng', first))
+        reopened = self.module.Store(self.path, {'chire', 'yuemeng'})
+        self.assertEqual({'count': 2, 'liked': True}, reopened.likes('chire', first))
+        self.assertEqual({'count': 2, 'liked': False}, reopened.likes('chire'))
+        self.rejects(404, lambda: reopened.likes('missing'))
+        self.rejects(404, lambda: reopened.like('missing', first))
+
 
 if __name__ == '__main__':
     unittest.main()

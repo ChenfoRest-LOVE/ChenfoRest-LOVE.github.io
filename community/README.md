@@ -1,6 +1,6 @@
 # 文章评论（本地预览与腾讯云 HTTPS）
 
-文章正文下方均有评论区，沿用现有深浅主题。访客可阅读，独立账号注册/登录后可发布 1–100 字的纯文本评论；支持退出、删除自己的评论，以及每页 20 条的“更早的评论”。账号不具备封面管理员权限，两套数据库完全独立。
+文章正文下方均有点赞和评论区，沿用现有深浅主题。访客可阅读、查看点赞数；独立账号注册/登录后，每篇文章只能点赞一次，也可发布 1–100 字的纯文本评论。点赞不能撤销，重复请求不会增加计数；支持退出、删除自己的评论，以及每页 20 条的“更早的评论”。账号不具备封面管理员权限，两套数据库完全独立。
 
 ## 本地使用
 
@@ -29,12 +29,13 @@ Windows 数据在 `%LOCALAPPDATA%/ForestComments/community.sqlite`；Linux 默�
 - 同一账号每 30 秒最多一条评论，同一 IP 每小时最多 20 条。限速跨文章生效，删除评论不会绕过限速。注册每 IP 每小时最多 5 次尝试、全局 50 次；登录每 IP 每 15 分钟最多 10 次尝试、全局 60 次，重启服务不清空限速。
 - 会话有效期 8 小时，Cookie 为 HttpOnly、SameSite=Strict；生产额外强制 Secure。会话和 CSRF 值不写入 localStorage/sessionStorage。写操作验证来源、会话和 CSRF。最多同时 24 个连接、2 个密码哈希任务，请求体最多 4096 字节。
 - 失败保留评论草稿；刷新页面会清除尚未提交的草稿。评论公开可见，请勿提交隐私信息。删除只删除当前数据库记录，备份中可能仍有历史数据。
+- 点赞存在私有数据库的 `likes` 表中，以文章 ID 与用户 ID 为联合主键。公开 `GET /api/community/likes?article=<ID>` 返回计数和当前登录状态；`POST /api/community/likes` 需要当前账号及 CSRF 校验，重复提交返回相同状态。
 
 新增文章时在 `articles.json` 添加 ID 与 HTML 路径，并复用现有文章的评论 section、两个脚本和样式引用，`data-comments-article` 使用同一个 ID。
 
 ## GitHub 与腾讯云部署
 
-GitHub Pages 的 `assets/comments-config.js` 默认 `enabled: false`，文章下显示“评论暂未开放”，不请求 API；本地预览只在响应中启用配置。腾讯云的 `denss.asia` 由 Nginx 将该文件和 `/api/community/` 代理到独立的评论服务，因此同源 HTTPS 页面会启用评论。
+GitHub Pages 的 `assets/comments-config.js` 默认 `enabled: false`，文章下提供主站入口，不请求 API；本地预览只在响应中启用配置。腾讯云的 `denss.asia` 由 Nginx 将该文件和 `/api/community/` 代理到独立的评论服务，因此同源 HTTPS 页面会启用评论和点赞。
 
 2026-11-07 已在腾讯云部署代码、服务和 HTTPS 代理；DNSPod 的 `@`、`www` 两条 A 记录已恢复并通过正常域名路径检查。评论后台不借用封面管理员账号，数据库独立。部署入口为 `sudo sh community/install.sh`，要求上传目录同时包含 `community/` 与 `deploy/nginx.conf`。安装程序先验证代码和配置，再启动服务、检查本机接口、验证 Nginx、重载并检查 HTTPS 接口；失败会恢复旧 Nginx 配置。生产结构：
 

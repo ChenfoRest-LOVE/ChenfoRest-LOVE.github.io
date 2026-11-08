@@ -40,6 +40,10 @@ async function register(page, username) {
   await check('public empty state and login prompt', async () => {
     await page.getByText('暂无评论。', { exact: true }).waitFor();
     assert.equal(await page.locator('[data-comment-form]').isVisible(), false);
+    assert.equal(await page.locator('[data-like-count]').textContent(), '0');
+    await page.locator('[data-like]').click();
+    assert(await page.getByRole('dialog', { name: '登录' }).isVisible());
+    await page.keyboard.press('Escape');
   });
   let releaseInitialList;
   const heldList = new Promise(resolve => { releaseInitialList = resolve; });
@@ -56,6 +60,15 @@ async function register(page, username) {
     await register(page, 'reader_one');
     await page.getByText('reader_one', { exact: true }).waitFor();
     assert(await page.locator('[data-comment-form]').isVisible());
+  });
+  await check('one like per reader survives refresh', async () => {
+    await page.locator('[data-like]').click();
+    await page.getByText('已点赞。', { exact: true }).waitFor();
+    assert.equal(await page.locator('[data-like-count]').textContent(), '1');
+    assert(await page.locator('[data-like]').isDisabled());
+    await page.reload();
+    await page.locator('[data-like][aria-pressed="true"]').waitFor();
+    assert.equal(await page.locator('[data-like-count]').textContent(), '1');
   });
   await check('counter matches server whitespace rules', async () => {
     await page.getByLabel('评论内容').fill('\ufeff' + '字'.repeat(100));
@@ -107,6 +120,8 @@ async function register(page, username) {
     await second.locator('[data-comment-list] article').waitFor();
     await register(second, 'reader_two');
     assert.equal(await second.locator('[data-comment-list] [data-delete]').count(), 0);
+    await second.locator('[data-like-count]').filter({ hasText: '1' }).waitFor();
+    assert.equal(await second.locator('[data-like]').getAttribute('aria-pressed'), 'false');
   });
   await check('untrusted text is displayed literally', async () => {
     await second.getByLabel('评论内容').fill('<img src=x onerror=alert(1)>');
@@ -197,7 +212,7 @@ db.close()`, path.join(temp, 'test.sqlite')], { windowsHide: true });
     staticPage.on('request', r => { if (r.url().includes('/api/community/')) apiCalls.push(r.url()); });
     await staticPage.route('**/assets/comments-config.js*', route => route.fulfill({ contentType: 'text/javascript', body: 'window.FOREST_COMMENTS={enabled:false};' }));
     await staticPage.goto(`${base}/content/writing/chire.html`);
-    await staticPage.getByText('评论暂未开放。', { exact: true }).waitFor();
+    await staticPage.getByText('登录、评论和点赞请前往', { exact: false }).waitFor();
     assert.equal(apiCalls.length, 0);
     assert.equal(await staticPage.getByRole('button', { name: '登录', exact: true }).count(), 0);
     await staticContext.close();

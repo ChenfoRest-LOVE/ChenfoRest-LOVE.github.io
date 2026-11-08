@@ -199,6 +199,11 @@ class Handler(BaseHTTPRequestHandler):
                 raise Problem(422, '查询参数无效。')
             before = int(query['before'][0]) if 'before' in query else None
             return self.reply(200, self.server.store.list(query.get('article', [''])[0], self.user(), before))
+        if parsed.path == PREFIX + 'likes':
+            query = parse_qs(parsed.query, keep_blank_values=True, max_num_fields=2)
+            if any(len(values) != 1 for values in query.values()):
+                raise Problem(422, '查询参数无效。')
+            return self.reply(200, self.server.store.likes(query.get('article', [''])[0], self.user()))
         if parsed.path.startswith(PREFIX):
             raise Problem(404, '接口不存在。')
         self.static(parsed.path)
@@ -219,6 +224,8 @@ class Handler(BaseHTTPRequestHandler):
         if path == PREFIX + 'comments':
             item = self.server.store.post(data.get('article'), data.get('text'), self.user(mutate=True), self.ip())
             return self.reply(201, item)
+        if path == PREFIX + 'likes':
+            return self.reply(200, self.server.store.like(data.get('article'), self.user(mutate=True)))
         match = re.fullmatch(r'/api/community/comments/([1-9][0-9]{0,17})/delete', path)
         if match:
             self.server.store.delete(int(match[1]), self.user(mutate=True))

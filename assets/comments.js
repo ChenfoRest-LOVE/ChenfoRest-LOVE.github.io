@@ -6,9 +6,10 @@
   const article = root.dataset.commentsArticle;
   const api = '/api/community/';
   let user = null, csrf = null, next = null, pending = false, authPending = false, mode = 'login', selected = null;
-  let revision = 0, loadId = 0, initializationId = 0;
+  let revision = 0, loadId = 0, initializationId = 0, likeId = 0, likePending = false, likeState = null;
   let feedbackId = 0;
   root.innerHTML = `
+    <div class="article-likes"><button class="article-like-button" type="button" data-like disabled aria-pressed="false"><span aria-hidden="true">♡</span> <span data-like-label>喜欢</span> <span class="article-like-count" data-like-count>—</span></button><p class="article-like-status" data-like-status role="status" aria-live="polite"></p></div>
     <div class="comments-heading"><h2 id="comments-title">评论</h2><div class="comments-account" data-account></div></div>
     <p class="comments-note" data-guest hidden>登录后发表评论。</p>
     <form class="comment-compose" data-comment-form hidden>
@@ -65,6 +66,28 @@
       target.append(name, button('退出', logout));
     } else target.append(button('登录', () => openAuth('login')));
     count();
+    renderLike();
+  }
+  function renderLike() {
+    const control = $('[data-like]');
+    const liked = Boolean(user && likeState?.liked);
+    control.disabled = likePending || !likeState || liked;
+    control.setAttribute('aria-pressed', String(liked));
+    $('[data-like-label]').textContent = liked ? '已点赞' : '喜欢';
+    $('[data-like-count]').textContent = likeState?.count ?? '—';
+    control.querySelector('[aria-hidden]').textContent = liked ? '♥' : '♡';
+  }
+  async function loadLikes() {
+    const current = ++likeId, version = revision;
+    try {
+      const result = await request(`likes?article=${encodeURIComponent(article)}`);
+      if (current !== likeId || version !== revision) return;
+      likeState = result; $('[data-like-status]').textContent = ''; renderLike();
+    } catch (error) {
+      if (current !== likeId || version !== revision) return;
+      likeState = null; renderLike();
+      $('[data-like-status]').textContent = errorText(error);
+    }
   }
   async function request(path, data) {
     const response = await fetch(api + path, {
@@ -76,7 +99,7 @@
     try { payload = await response.json(); } catch { throw new Error('评论服务暂时不可用，请稍后重试。'); }
     if (!response.ok) {
       if (response.status === 401 && !['login', 'register'].includes(path)) {
-        revision++; user = null; csrf = null; account();
+        revision++; user = null; csrf = null; likeState = null; account();
         list.querySelectorAll('[data-delete]').forEach(node => node.remove());
       }
       throw new Error(payload.error || '操作失败，请稍后重试。');
@@ -128,7 +151,7 @@
       const payload = await request('session');
       if (current !== initializationId || version !== revision) return;
       user = payload.user; csrf = payload.csrf;
-      account(); await load();
+      account(); await Promise.all([load(), loadLikes()]);
     } catch (error) { if (current === initializationId && version === revision) { message(errorText(error), true); $('[data-retry]').hidden = false; } }
   }
   function openAuth(value) {
@@ -159,17 +182,27 @@
     $('[data-auth-status]').textContent = mode === 'register' ? '正在创建账号…' : '正在登录…';
     try {
       const payload = await request(mode, { username, password });
-      revision++; user = payload.user; csrf = payload.csrf; account(); auth.close(); authPending = false; await load();
+      revision++; user = payload.user; csrf = payload.csrf; likeState = null; account(); auth.close(); authPending = false; await Promise.all([load(), loadLikes()]);
     } catch (error) { $('[data-auth-status]').textContent = errorText(error); }
     finally { authPending = false; authForm.querySelectorAll('button').forEach(node => node.disabled = false); }
   });
   async function logout() {
     if (pending || authPending) return; pending = true; count();
-    try { await request('logout', {}); revision++; user = null; csrf = null; account(); await load(); }
+    try { await request('logout', {}); revision++; user = null; csrf = null; likeState = null; account(); await Promise.all([load(), loadLikes()]); }
     catch (error) { message(errorText(error), true); }
     finally { pending = false; count(); }
   }
   textarea.addEventListener('input', count);
+  $('[data-like]').addEventListener('click', async () => {
+    if (!user) { openAuth('login'); return; }
+    if (likePending || !likeState || likeState.liked) return;
+    likePending = true; renderLike();
+    try {
+      likeState = await request('likes', { article });
+      $('[data-like-status]').textContent = '已点赞。';
+    } catch (error) { $('[data-like-status]').textContent = errorText(error); }
+    finally { likePending = false; renderLike(); }
+  });
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (pending || !user || form.querySelector('[type=submit]').disabled) return;
     pending = true; count(); const text = textarea.value;

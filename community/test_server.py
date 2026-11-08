@@ -134,6 +134,23 @@ class HTTPTests(unittest.TestCase):
             self.assertIn('error', json.loads(response.read()))
             connection.close()
 
+    def test_like_requires_reader_and_csrf_and_is_idempotent(self):
+        path = '/api/community/likes?article=chire'
+        self.assertEqual({'count': 0, 'liked': False}, json.loads(self.request(path)[2]))
+        self.assertEqual(401, self.request('/api/community/likes', {'article': 'chire'})[0])
+        self.register()
+        self.assertEqual(403, self.request('/api/community/likes', {'article': 'chire'}, {'X-CSRF-Token': ''})[0])
+        for _ in range(2):
+            status, headers, raw = self.request('/api/community/likes', {'article': 'chire'})
+            self.assertEqual(200, status, raw)
+            self.assertEqual('no-store', headers['Cache-Control'])
+            self.assertEqual({'count': 1, 'liked': True}, json.loads(raw))
+        self.assertEqual({'count': 1, 'liked': True}, json.loads(self.request(path)[2]))
+        self.assertEqual({'count': 0, 'liked': False}, json.loads(self.request('/api/community/likes?article=yuemeng')[2]))
+        self.assertEqual(404, self.request('/api/community/likes?article=missing')[0])
+        self.assertEqual(200, self.request('/api/community/logout', {})[0])
+        self.assertEqual({'count': 1, 'liked': False}, json.loads(self.request(path)[2]))
+
 
 if __name__ == '__main__':
     unittest.main()
