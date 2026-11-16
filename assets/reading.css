@@ -1,0 +1,43 @@
+/* An editorial rhythm for the reading archive. */
+.reading-page .module-main{max-width:1180px}
+.reading-page .module-heading{padding-bottom:32px}
+.reading-page .module-heading h1{font-size:clamp(36px,4.2vw,56px);line-height:1.25;letter-spacing:.025em}
+.reading-page .module-description{margin-top:12px;letter-spacing:.04em}
+.reading-page .module-content{padding-top:0}
+.reading-page .quote-feature{position:relative;align-items:flex-start;gap:28px;min-height:290px;padding:48px 82px 50px 0}
+.reading-page .quote-feature .quote-mark{flex:none;font-size:82px;line-height:1;margin-top:-6px}
+.reading-page .quote-feature p{max-width:25ch;font-size:clamp(27px,3.2vw,41px);line-height:1.55;letter-spacing:.012em;overflow-wrap:anywhere}
+.reading-page .quote-feature cite{margin-top:27px;font-size:12px;line-height:1.7;letter-spacing:.06em}
+.reading-page .quote-feature button{position:absolute;right:0;bottom:49px;width:44px;height:44px;font-size:21px}
+.reading-page .reading-caption{margin-top:14px;font-size:11px;letter-spacing:.04em}
+.reading-page .reading-index{max-width:none;margin-top:clamp(70px,9vw,120px)}
+.reading-index-heading{display:flex;justify-content:space-between;align-items:baseline;gap:24px;padding-bottom:18px}
+.reading-index-heading .section-label{margin:0}
+.reading-index-heading>span{font-size:11px;color:var(--muted)}
+.reading-page .reading-index ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:6%;counter-reset:source}
+.reading-page .reading-index li{counter-increment:source;position:relative;display:block;min-width:0;padding:23px 0 23px 45px;font-size:12px;line-height:1.5}
+.reading-page .reading-index li::before{content:counter(source,decimal-leading-zero);position:absolute;top:26px;left:0;color:var(--muted);font:11px/1.5 var(--sans);font-variant-numeric:tabular-nums}
+.reading-page .reading-index li>span{display:block;color:var(--muted)}
+.reading-page .reading-index cite{display:block;margin-top:5px;color:var(--ink);font:normal clamp(16px,1.5vw,20px)/1.5 var(--serif);overflow-wrap:anywhere}
+.reading-page .reading-index cite a{text-decoration-color:var(--muted)}
+.reading-page .reading-index li:nth-last-child(-n+2){border-bottom:1px solid var(--line)}
+@media(max-width:700px){
+  .reading-page .module-heading{padding-bottom:26px}
+  .reading-page .module-heading h1{font-size:36px}
+  .reading-page .quote-feature{min-height:250px;padding:38px 0 74px;gap:12px}
+  .reading-page .quote-feature .quote-mark{font-size:58px;margin-top:-2px}
+  .reading-page .quote-feature p{font-size:clamp(22px,6vw,30px);line-height:1.6}
+  .reading-page .quote-feature cite{font-size:11px;margin-top:18px}
+  .reading-page .quote-feature button{right:0;bottom:20px;width:40px;height:40px}
+  .reading-page .reading-index{margin-top:70px}
+  .reading-page .reading-index ol{grid-template-columns:1fr}
+  .reading-page .reading-index li{padding:19px 0 20px 40px}
+  .reading-page .reading-index li::before{top:22px}
+  .reading-page .reading-index cite{font-size:18px}
+  .reading-page .reading-index li:nth-last-child(2){border-bottom:0}
+}
+@media(max-width:380px){
+  .reading-page .quote-feature{gap:8px}
+  .reading-page .quote-feature .quote-mark{font-size:46px}
+  .reading-page .quote-feature p{font-size:21px}
+}
