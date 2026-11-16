@@ -1,38 +1,39 @@
 /* A quiet index and a continuous reading surface. */
 .writing-main { max-width: 1100px; margin-inline: auto; }
-.writing-main .module-heading { padding-bottom: 30px; }
+.writing-main .module-heading { max-width: 700px; margin-inline: auto; padding-bottom: 30px; }
 .writing-main .module-heading h1 { font-size: clamp(30px,3.4vw,42px); letter-spacing: .04em; }
 .writing-main .back-link { margin-bottom: 28px; }
 .writing-main .section-label { font-size: 9px; margin-bottom: 14px; }
-.writing-index { max-width: 860px; }
+.writing-main .module-content { max-width: 700px; margin-inline: auto; }
+.writing-index { max-width: 700px; }
 .writing-entry { display: flex; align-items: baseline; justify-content: space-between; gap: 28px; padding: 28px 0; border-bottom: 1px solid var(--line); }
 .writing-entry h2 { font: 400 23px/1.45 var(--serif); letter-spacing: .045em; transition: color .25s, transform .25s; }
-.writing-entry time { flex-shrink: 0; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .12em; }
+.writing-entry time { flex-shrink: 0; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .08em; }
 .writing-entry:hover h2 { color: var(--accent); transform: translateX(5px); }
 .writing-index .content-status { padding: 30px 0; color: var(--muted); font-size: 12px; }
 .essay-page { --reading-serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif; }
 .reading-progress { position: fixed; inset: 0 auto auto 0; width: 100%; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; z-index: 20; pointer-events: none; }
 .essay-main { width: 100%; max-width: 1200px; margin-inline: auto; padding: 42px 7% 88px; }
-.essay-main > .back-link { margin-bottom: 34px; }
+.essay-main > .back-link { display: flex; width: min(100%, 650px); margin: 0 auto 34px; }
 .essay { max-width: 650px; margin-inline: auto; }
 .essay-heading { padding-bottom: 27px; border-bottom: 1px solid var(--line); margin-bottom: 39px; animation: essay-arrive .7s ease both; }
-.essay-heading time { color: var(--muted); font: 11px/1.5 var(--sans); letter-spacing: .16em; font-variant-numeric: tabular-nums; }
+.essay-heading time { color: var(--muted); font: 12px/1.5 var(--sans); letter-spacing: .1em; font-variant-numeric: tabular-nums; }
 .essay-heading h1 { margin-top: 14px; font: 400 36px/1.5 var(--reading-serif); letter-spacing: .065em; text-wrap: balance; }
 .essay-body { font: 400 18px/1.98 var(--reading-serif); letter-spacing: .025em; overflow-wrap: break-word; line-break: strict; }
-.essay-body p { margin: 0 0 1.38em; text-indent: 2em; }
+.essay-body p { margin: 0 0 1.5em; text-indent: 2em; }
 .essay-body p:last-child { margin-bottom: 0; }
 .essay-body .essay-lead { text-indent: 0; color: var(--muted); font-size: .94em; }
-.essay-body .essay-section-title { margin: 2.2em 0 1em; padding-top: .55em; border-top: 1px solid var(--line); font: 400 clamp(24px,2.2vw,28px)/1.4 var(--reading-serif); letter-spacing: .12em; color: var(--ink); }
+.essay-body .essay-section-title { margin: 2.4em 0 1.15em; padding-top: .65em; border-top: 1px solid var(--line); font: 400 clamp(24px,2.2vw,28px)/1.4 var(--reading-serif); letter-spacing: .12em; color: var(--ink); }
 .essay-body .essay-figure { margin: 2em 0 2.5em; }
 .essay-body .essay-figure img { display: block; width: auto; max-width: 100%; height: auto; margin-inline: auto; border-radius: 4px; }
-.essay-citation { font: 400 .65em/0 var(--sans); vertical-align: super; white-space: nowrap; letter-spacing: 0; margin-inline: .08em; scroll-margin-top: 32px; }
+.essay-citation { font: 400 .73em/1 var(--sans); vertical-align: super; white-space: nowrap; letter-spacing: 0; margin-inline: .12em; scroll-margin-top: 32px; }
 .essay-citation a { color: var(--accent); text-decoration: none; }
 .essay-citation a:hover, .essay-citation:target a { text-decoration: underline; text-underline-offset: .18em; }
 .essay-citation a:focus-visible, .reference-back:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
-.essay-references { margin-top: 58px; border-top: 1px solid var(--line); padding-top: 30px; font: 13px/1.9 var(--sans); color: var(--muted); }
+.essay-references { margin-top: 64px; border-top: 1px solid var(--line); padding-top: 34px; font: 14px/1.85 var(--sans); color: var(--muted); }
 .essay-references h2 { margin-bottom: 23px; color: var(--ink); font: 400 17px/1.5 var(--reading-serif); letter-spacing: .1em; }
 .reference-list { padding: 0; list-style: none; }
-.reference-list li { position: relative; display: grid; grid-template-columns: 27px minmax(0,1fr); gap: 8px; padding-right: 22px; margin-top: 16px; scroll-margin-top: 32px; }
+.reference-list li { position: relative; display: grid; grid-template-columns: 30px minmax(0,1fr); gap: 10px; padding-right: 28px; margin-top: 18px; scroll-margin-top: 32px; }
 .reference-list li:first-child { margin-top: 0; }
 .reference-list p { margin: 0; overflow-wrap: anywhere; }
 .reference-number { font-variant-numeric: tabular-nums; }
@@ -48,20 +49,20 @@
 .essay-navigation a:hover { color: var(--ink); }
 .essay-navigation .adjacent-essay { text-align: right; }
 @keyframes essay-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-@media (min-width: 1600px) { .essay { max-width: 690px; } .essay-body { font-size: 19px; } .essay-navigation, .essay-page .comments { max-width: 690px; } }
+@media (min-width: 1600px) { .essay, .essay-main > .back-link { max-width: 690px; } .essay-body { font-size: 19px; } .essay-navigation, .essay-page .comments { max-width: 690px; } }
 @media (max-width: 600px) {
   .writing-main .module-heading h1 { font-size: 31px; }
   .writing-main .back-link { margin-bottom: 24px; }
   .writing-entry { flex-direction: column-reverse; align-items: flex-start; padding: 23px 0 25px; gap: 5px; }
   .writing-entry h2 { font-size: 21px; line-height: 1.5; }
-  .writing-entry time { font-size: 10px; letter-spacing: .06em; }
+  .writing-entry time { font-size: 11px; letter-spacing: .06em; }
   .essay-main { padding: 28px 6% 65px; }
   .essay-main > .back-link { margin-bottom: 28px; }
   .essay-heading { padding-bottom: 24px; margin-bottom: 31px; }
   .essay-heading h1 { font-size: 31px; margin-top: 12px; letter-spacing: .04em; }
-  .essay-heading time { font-size: 10px; }
+  .essay-heading time { font-size: 11px; }
   .essay-body { font-size: 17px; line-height: 1.95; letter-spacing: .01em; }
-  .essay-body p { margin-bottom: 1.3em; }
+  .essay-body p { margin-bottom: 1.45em; }
   .essay-body .essay-section-title { margin-top: 1.9em; }
   .essay-end { margin-block: 45px; }
   .essay-navigation { font-size: 11px; padding-top: 23px; }
