@@ -5,13 +5,30 @@ const quotes = [
   { text: 'Cogito, ergo sum.', source: 'René Descartes · Principia Philosophiae' },
   { text: 'Was mich nicht umbringt, macht mich stärker.', source: 'Friedrich Nietzsche · Götzen-Dämmerung' },
   { text: 'Je pense, donc je suis.', source: 'René Descartes · Discours de la méthode' },
-  { text: 'Ὅτι οὐ τὰ πράγματα ταράσσει τοὺς ἀνθρώπους, ἀλλὰ τὰ περὶ τῶν πραγμάτων δόγματα.', source: 'Epictetus · Enchiridion' }
+  { text: 'Ὅτι οὐ τὰ πράγματα ταράσσει τοὺς ἀνθρώπους, ἀλλὰ τὰ περὶ τῶν πραγμάτων δόγματα.', source: 'Epictetus · Enchiridion' },
+  { text: '知人者智，自知者明。', source: '《道德經》· 第三十三章', url: 'https://ctext.org/text.pl?if=en&node=11624&show=parallel' },
+  { text: '上善若水。水善利萬物而不爭。', source: '《道德經》· 第八章', url: 'https://ctext.org/text.pl?if=en&node=11599&show=parallel' },
+  { text: '千里之行，始於足下。', source: '《道德經》· 第六十四章', url: 'https://ctext.org/text.pl?if=en&node=11655&show=parallel' },
+  { text: '學而不思則罔，思而不學則殆。', source: '《論語》· 為政', url: 'https://ctext.org/text.pl?if=en&node=1132&show=parallel' },
+  { text: '君子和而不同，小人同而不和。', source: '《論語》· 子路', url: 'https://ctext.org/text.pl?if=en&node=416808&show=parallel' },
+  { text: '相濡以沫，不如相忘於江湖。', source: '《莊子》· 大宗師', url: 'https://ctext.org/text.pl?if=en&node=41979&show=parallel' },
+  { text: '盡信《書》，則不如無《書》。', source: '《孟子》· 盡心下', url: 'https://ctext.org/text.pl?if=en&node=1843&remap=gb&show=parallel' },
+  { text: '鍥而不舍，金石可鏤。', source: '《荀子》· 勸學', url: 'https://ctext.org/xunzi/quan-xue/zh' }
 ];
 let quoteIndex = 0;
 document.querySelector('#quote button')?.addEventListener('click', () => {
   quoteIndex = (quoteIndex + 1) % quotes.length;
   document.querySelector('#quote p').textContent = quotes[quoteIndex].text;
-  document.querySelector('#quote cite').textContent = quotes[quoteIndex].source;
+  const source = document.querySelector('#quote cite');
+  source.replaceChildren();
+  if (quotes[quoteIndex].url) {
+    const link = document.createElement('a');
+    link.href = quotes[quoteIndex].url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = quotes[quoteIndex].source;
+    source.append(link);
+  } else source.textContent = quotes[quoteIndex].source;
 });
 
 const themeToggle = document.querySelector('.theme-toggle');
