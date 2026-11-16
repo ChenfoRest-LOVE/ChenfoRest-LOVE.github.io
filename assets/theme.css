@@ -5,3 +5,22 @@ html{background:var(--paper)}body{background:var(--paper);color:var(--ink);trans
 html[data-theme="light"] .hero-image:after{background:linear-gradient(180deg,rgba(8,17,12,.36),rgba(8,17,12,.08) 35%,rgba(8,17,12,.68) 100%)}
 html[data-theme="light"] .photo-media img{filter:saturate(.8)}
 @media(prefers-reduced-motion:reduce){body{transition:none}}
+/* Homepage scenes share the same typography while changing the surrounding palette. */
+html[data-scene="nenjiang"][data-theme="dark"]{--paper:#101c27;--ink:#f1eee6;--muted:#adb9c2;--line:#324758;--accent:#e2a65f;--surface:#1a2b39}
+html[data-scene="harbin"][data-theme="dark"]{--paper:#0b141c;--ink:#f3efe5;--muted:#aebbc4;--line:#293d4b;--accent:#d6a067;--surface:#14232d}
+html[data-scene="nenjiang"][data-theme="light"]{--paper:#edece7;--ink:#243849;--muted:#60717b;--line:#bec9cb;--accent:#9b5b27;--surface:#e2e8e7}
+html[data-scene="harbin"][data-theme="light"]{--paper:#e9e9e5;--ink:#1d303b;--muted:#5f7079;--line:#bec6c7;--accent:#8f5a30;--surface:#dfe6e5}
+.home-page .hero-image{background-image:url('images/forest-hero-image2-wide.webp');background-size:cover;background-position:center center}
+html[data-scene="nenjiang"] .home-page .hero-image{background-image:url('images/hero-nenjiang-image2.webp');background-position:center center}
+html[data-scene="harbin"] .home-page .hero-image{background-image:url('images/hero-harbin-image2.webp');background-position:center center}
+html[data-scene="nenjiang"] .home-page .hero{background:#101c27}
+html[data-scene="harbin"] .home-page .hero{background:#0b141c}
+html[data-scene="nenjiang"] .home-page .hero-image:after{background:linear-gradient(180deg,rgba(4,13,24,.42),transparent 28%,rgba(4,13,24,.17) 48%,rgba(4,13,24,.91) 100%)}
+html[data-scene="harbin"] .home-page .hero-image:after{background:linear-gradient(180deg,rgba(3,10,16,.24),rgba(3,10,16,.02) 45%,rgba(3,10,16,.85) 100%)}
+html[data-scene="nenjiang"] .home-page,html[data-scene="harbin"] .home-page{--scene-hero-accent:#e9b477}
+html[data-scene="nenjiang"] .home-page .eyebrow span,html[data-scene="harbin"] .home-page .eyebrow span{background:var(--scene-hero-accent)}
+html[data-scene="nenjiang"] .home-page nav a[aria-current="page"]:after,html[data-scene="harbin"] .home-page nav a[aria-current="page"]:after{background:var(--scene-hero-accent)}
+.hero-credit-nenjiang,.hero-credit-harbin{display:none}
+html[data-scene="nenjiang"] .hero-credit-forest,html[data-scene="harbin"] .hero-credit-forest{display:none}
+html[data-scene="nenjiang"] .hero-credit-nenjiang,html[data-scene="harbin"] .hero-credit-harbin{display:block}
+@media(max-width:600px){.home-page .hero-image{background-image:url('images/forest-hero-image2-mobile.webp')}html[data-scene="nenjiang"] .home-page .hero-image{background-image:url('images/hero-nenjiang-image2.webp')}html[data-scene="harbin"] .home-page .hero-image{background-image:url('images/hero-harbin-image2.webp');background-position:25% center}}

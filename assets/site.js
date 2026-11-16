@@ -20,7 +20,7 @@ function setTheme(theme) {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   themeToggle.setAttribute('aria-pressed', String(dark));
   themeToggle.setAttribute('aria-label', dark ? '切换浅色模式' : '切换深色模式');
-  document.querySelector('meta[name="theme-color"]').content = dark ? '#141713' : '#eeeee6';
+  document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim();
   try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch { /* Storage can be unavailable in private or restricted contexts. */ }
 }
 let initialTheme = 'dark';
